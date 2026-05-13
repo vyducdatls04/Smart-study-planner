@@ -23,7 +23,7 @@ const app = express();
 ========================= */
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://your-project.vercel.app"
+  "https://smart-study-planner-do7p.onrender.com"
 ];
 
 app.use(cors({
