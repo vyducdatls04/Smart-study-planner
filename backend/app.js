@@ -14,34 +14,24 @@ import planRoutes from "./src/routes/planRoutes.js";
 
 const app = express();
 
-/* ALLOWED ORIGINS */
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://smart-study-planner-fawn-tau.vercel.app",
-  "https://smart-study-planner-mglewn013-vyducdatls04s-projects.vercel.app",
-];
-
-/* CORS */
+/* =========================
+   CORS FIX
+========================= */
 app.use(
   cors({
-    origin: function (origin, callback) {
-      // cho phép Postman/mobile app/request không origin
-      if (!origin) return callback(null, true);
-
-      if (allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
+    origin: true,
     credentials: true,
   })
 );
 
-/* BODY PARSER */
+/* =========================
+   BODY PARSER
+========================= */
 app.use(express.json());
 
-/* ENV CHECK */
+/* =========================
+   ENV CHECK
+========================= */
 console.log(
   "JWT SECRET:",
   process.env.JWT_SECRET ? "OK" : "MISSING"
@@ -52,7 +42,9 @@ console.log(
   process.env.OPENAI_API_KEY ? "OK" : "MISSING"
 );
 
-/* ROUTES */
+/* =========================
+   ROUTES
+========================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/tasks", taskRoutes);
@@ -61,22 +53,30 @@ app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/plans", planRoutes);
 
-/* STATIC */
+/* =========================
+   STATIC FILES
+========================= */
 app.use("/uploads", express.static("uploads"));
 
-/* ROOT */
+/* =========================
+   ROOT ROUTE
+========================= */
 app.get("/", (req, res) => {
   res.send("Backend is running 🚀");
 });
 
-/* 404 */
+/* =========================
+   404 HANDLER
+========================= */
 app.use((req, res) => {
   res.status(404).json({
     message: "Route not found",
   });
 });
 
-/* GLOBAL ERROR */
+/* =========================
+   GLOBAL ERROR HANDLER
+========================= */
 app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
 
@@ -85,7 +85,9 @@ app.use((err, req, res, next) => {
   });
 });
 
-/* START */
+/* =========================
+   START SERVER
+========================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
