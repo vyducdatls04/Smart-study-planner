@@ -3,7 +3,11 @@ dotenv.config();
 
 import express from "express";
 import cors from "cors";
+import path from "path";
 
+/* =========================
+   ROUTES
+========================= */
 import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import taskRoutes from "./src/routes/taskRoutes.js";
@@ -15,11 +19,25 @@ import planRoutes from "./src/routes/planRoutes.js";
 const app = express();
 
 /* =========================
-   CORS FIX
+   CORS CONFIG (PRODUCTION SAFE)
 ========================= */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5000",
+  "https://smart-study-planner-do7p.onrender.com"
+];
+
 app.use(
   cors({
-    origin: true,
+    origin: function (origin, callback) {
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+
+      return callback(new Error("Blocked by CORS"));
+    },
     credentials: true,
   })
 );
@@ -30,17 +48,15 @@ app.use(
 app.use(express.json());
 
 /* =========================
-   ENV CHECK
+   ENV CHECK (SAFE)
 ========================= */
-console.log(
-  "JWT SECRET:",
-  process.env.JWT_SECRET ? "OK" : "MISSING"
-);
+if (!process.env.JWT_SECRET) {
+  console.warn("⚠️ JWT_SECRET is missing!");
+}
 
-console.log(
-  "OPENAI KEY:",
-  process.env.OPENAI_API_KEY ? "OK" : "MISSING"
-);
+if (!process.env.OPENAI_API_KEY) {
+  console.warn("⚠️ OPENAI_API_KEY is missing!");
+}
 
 /* =========================
    ROUTES
@@ -54,9 +70,12 @@ app.use("/api/ai", aiRoutes);
 app.use("/api/plans", planRoutes);
 
 /* =========================
-   STATIC FILES
+   STATIC FILES (UPLOADS)
 ========================= */
-app.use("/uploads", express.static("uploads"));
+app.use(
+  "/uploads",
+  express.static(path.join(process.cwd(), "uploads"))
+);
 
 /* =========================
    ROOT ROUTE
@@ -86,10 +105,10 @@ app.use((err, req, res, next) => {
 });
 
 /* =========================
-   START SERVER
+   START SERVER (RENDER READY)
 ========================= */
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} 🚀`);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
