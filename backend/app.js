@@ -14,13 +14,26 @@ import planRoutes from "./src/routes/planRoutes.js";
 
 const app = express();
 
+/* ALLOWED ORIGINS */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://smart-study-planner-fawn-tau.vercel.app",
+  "https://smart-study-planner-mglewn013-vyducdatls04s-projects.vercel.app",
+];
+
 /* CORS */
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://smart-study-planner-fawn-tau.vercel.app",
-    ],
+    origin: function (origin, callback) {
+      // cho phép Postman/mobile app/request không origin
+      if (!origin) return callback(null, true);
+
+      if (allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
@@ -68,7 +81,7 @@ app.use((err, req, res, next) => {
   console.error("SERVER ERROR:", err);
 
   res.status(500).json({
-    message: "Internal Server Error",
+    message: err.message || "Internal Server Error",
   });
 });
 
@@ -76,7 +89,5 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(
-    `Server running on port ${PORT} 🚀`
-  );
+  console.log(`Server running on port ${PORT} 🚀`);
 });
