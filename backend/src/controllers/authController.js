@@ -2,12 +2,28 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+/* =========================
+   REGISTER
+========================= */
+
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;
 
-    if (!name?.trim() || !email?.trim() || !password?.trim()) {
-      return res.status(400).json({ message: "Thiếu dữ liệu" });
+    if (
+      !name?.trim() ||
+      !email?.trim() ||
+      !password?.trim()
+    ) {
+      return res.status(400).json({
+        message: "Thiếu dữ liệu",
+      });
+    }
+
+    if (password.trim().length < 6) {
+      return res.status(400).json({
+        message: "Mật khẩu phải ít nhất 6 ký tự",
+      });
     }
 
     const [exist] = await db.query(
@@ -16,36 +32,66 @@ export const register = async (req, res) => {
     );
 
     if (exist.length) {
-      return res.status(400).json({ message: "Email đã tồn tại" });
+      return res.status(400).json({
+        message: "Email đã tồn tại",
+      });
     }
 
-    const hash = await bcrypt.hash(password.trim(), 10);
-
-    await db.query(
-      "INSERT INTO users (name, email, password) VALUES (?, ?, ?)",
-      [name.trim(), email.trim(), hash]
+    // HASH PASSWORD
+    const hashedPassword = await bcrypt.hash(
+      password.trim(),
+      10
     );
 
-    return res.json({ message: "Đăng ký thành công" });
+    await db.query(
+      `
+      INSERT INTO users (name, email, password)
+      VALUES (?, ?, ?)
+      `,
+      [
+        name.trim(),
+        email.trim(),
+        hashedPassword,
+      ]
+    );
+
+    return res.status(201).json({
+      message: "Đăng ký thành công",
+    });
   } catch (err) {
-    console.error("REGISTER SERVER ERROR:", err);
-    return res.status(500).json({ message: err.message });
+    console.error(
+      "REGISTER SERVER ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+      message: "Lỗi server",
+    });
   }
 };
+
+/* =========================
+   LOGIN
+========================= */
 
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    if (!email?.trim() || !password?.trim()) {
+    if (
+      !email?.trim() ||
+      !password?.trim()
+    ) {
       return res.status(400).json({
-        message: "Vui lòng nhập email và mật khẩu",
+        message:
+          "Vui lòng nhập email và mật khẩu",
       });
     }
 
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({
-        message: "Thiếu JWT_SECRET trong file .env",
+        message:
+          "Thiếu JWT_SECRET trong server",
       });
     }
 
@@ -55,27 +101,40 @@ export const login = async (req, res) => {
     );
 
     if (!users.length) {
-      return res.status(400).json({ message: "Sai email" });
+      return res.status(400).json({
+        message: "Sai email hoặc mật khẩu",
+      });
     }
 
     const user = users[0];
-    const match = await bcrypt.compare(password.trim(), user.password);
 
-    if (!match) {
-      return res.status(400).json({ message: "Sai mật khẩu" });
+    // CHECK PASSWORD
+    const isMatch = await bcrypt.compare(
+      password.trim(),
+      user.password
+    );
+
+    if (!isMatch) {
+      return res.status(400).json({
+        message: "Sai email hoặc mật khẩu",
+      });
     }
 
+    // CREATE JWT
     const token = jwt.sign(
       {
         id: user.id,
         email: user.email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "7d" }
+      {
+        expiresIn: "7d",
+      }
     );
 
-    return res.json({
+    return res.status(200).json({
       token,
+
       user: {
         id: user.id,
         name: user.name,
@@ -83,7 +142,13 @@ export const login = async (req, res) => {
       },
     });
   } catch (err) {
-    console.error("LOGIN SERVER ERROR:", err);
-    return res.status(500).json({ message: err.message });
+    console.error(
+      "LOGIN SERVER ERROR:",
+      err
+    );
+
+    return res.status(500).json({
+      message: "Lỗi server",
+    });
   }
 };
