@@ -1,15 +1,14 @@
-import express from "express";
-import { 
-  getAIPlan, 
-  chatWithAI, 
-  getAIHistory, 
-  clearAIHistory 
+﻿import express from "express";
+import {
+  getAIPlan,
+  chatWithAI,
+  getAIHistory,
+  clearAIHistory,
 } from "../controllers/aiController.js";
 import { verifyToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-// Tất cả route trong này đều cần token
 router.use(verifyToken);
 
 router.post("/chat", chatWithAI);

@@ -1,17 +1,108 @@
-# React + Vite
+﻿# Smart Study Planner
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Smart Study Planner is a React + Express + MySQL study management app.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Frontend: React, Vite, Tailwind CSS
+- Backend: Express, MySQL, JWT Auth
+- AI: Groq API with demo fallback when no key is configured
 
-## React Compiler
+## Local Setup
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 1. Database
 
-## Expanding the ESLint configuration
+Create a MySQL database and import `database.sql`.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-# Smart-study-planner
+```bash
+mysql -u root -p smart_study_planner < database.sql
+```
+
+### 2. Backend
+
+```bash
+cd backend
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Required backend env:
+
+```env
+JWT_SECRET=change_this_secret
+DB_HOST=localhost
+DB_PORT=3306
+DB_USER=root
+DB_PASSWORD=
+DB_NAME=smart_study_planner
+DB_SSL=false
+FRONTEND_URL=http://localhost:5173
+CORS_ORIGINS=http://localhost:5173
+GROQ_API_KEY=
+```
+
+### 3. Frontend
+
+```bash
+npm install
+cp .env.example .env
+npm run dev
+```
+
+Frontend env:
+
+```env
+VITE_API_URL=http://localhost:5000/api
+```
+
+## Deploy Backend on Render
+
+Use the included `render.yaml`, or create a Render Web Service manually:
+
+- Root Directory: `backend`
+- Build Command: `npm install`
+- Start Command: `npm start`
+- Health Check Path: `/health`
+
+Set these env vars in Render:
+
+```env
+NODE_ENV=production
+JWT_SECRET=your_secret
+FRONTEND_URL=https://your-vercel-app.vercel.app
+CORS_ORIGINS=https://your-vercel-app.vercel.app
+DATABASE_URL=mysql://user:password@host:3306/database
+DB_SSL=true
+GROQ_API_KEY=optional_key
+```
+
+Render does not provide MySQL by default. Use a hosted MySQL provider such as Railway, Aiven, PlanetScale-compatible MySQL, or any MySQL server that exposes a connection URL.
+
+## Deploy Frontend on Vercel
+
+- Framework Preset: Vite
+- Build Command: `npm run build`
+- Output Directory: `dist`
+
+Set this env var in Vercel:
+
+```env
+VITE_API_URL=https://your-render-api.onrender.com/api
+```
+
+## Demo Account
+
+If seeded locally:
+
+```txt
+Email: demo@smartstudy.com
+Password: 123456
+```
+
+## Verification
+
+```bash
+npm run lint
+npm run build
+```

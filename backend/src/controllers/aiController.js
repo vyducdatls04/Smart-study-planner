@@ -1,4 +1,4 @@
-﻿// src/controllers/aiController.js
+// src/controllers/aiController.js
 import db from "../config/db.js";
 import Groq from "groq-sdk";
 
@@ -181,6 +181,7 @@ export const clearAIHistory = async (req, res) => {
     await db.query("DELETE FROM ai_messages WHERE user_id = ?", [req.user.id]);
     return res.json({ message: "Đã xóa lịch sử" });
   } catch (err) {
+    console.error("CLEAR AI HISTORY ERROR:", err.message);
     return res.status(500).json({ message: "Lỗi xóa lịch sử" });
   }
 };

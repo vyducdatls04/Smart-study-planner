@@ -5,9 +5,6 @@ import express from "express";
 import cors from "cors";
 import path from "path";
 
-/* =========================
-   ROUTES
-========================= */
 import authRoutes from "./src/routes/authRoutes.js";
 import userRoutes from "./src/routes/userRoutes.js";
 import taskRoutes from "./src/routes/taskRoutes.js";
@@ -18,43 +15,47 @@ import planRoutes from "./src/routes/planRoutes.js";
 
 const app = express();
 
-/* =========================
-   CORS CONFIG (PRODUCTION SAFE)
-========================= */
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://smart-study-planner-4ipg.vercel.app"
-  
+const configuredOrigins = [
+  process.env.FRONTEND_URL,
+  ...(process.env.CORS_ORIGINS || "")
+    .split(",")
+    .map((origin) => origin.trim())
+    .filter(Boolean),
 ];
 
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(null, true); // tránh crash khi dev
-  },
-  credentials: true
-}));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+  ...configuredOrigins,
+].filter(Boolean);
 
-/* =========================
-   BODY PARSER
-========================= */
-app.use(express.json());
+app.use(
+  cors({
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
 
-/* =========================
-   ENV CHECK (SAFE)
-========================= */
+      return callback(new Error(`CORS blocked origin: ${origin}`));
+    },
+    credentials: true,
+  })
+);
+
+app.use(express.json({ limit: "1mb" }));
+
 if (!process.env.JWT_SECRET) {
-  console.warn("⚠️ JWT_SECRET is missing!");
+  console.warn("JWT_SECRET is missing");
 }
 
-if (!process.env.OPENAI_API_KEY) {
-  console.warn("⚠️ OPENAI_API_KEY is missing!");
+if (!process.env.GROQ_API_KEY && !process.env.OPENAI_API_KEY) {
+  console.warn("No AI API key configured. AI will use demo fallback when available.");
 }
 
-/* =========================
-   ROUTES
-========================= */
+app.get("/health", (req, res) => {
+  res.json({ status: "ok" });
+});
+
 app.use("/api/auth", authRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/tasks", taskRoutes);
@@ -62,47 +63,23 @@ app.use("/api/subjects", subjectRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/plans", planRoutes);
+app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
-/* =========================
-   STATIC FILES (UPLOADS)
-========================= */
-app.use(
-  "/uploads",
-  express.static(path.join(process.cwd(), "uploads"))
-);
-
-/* =========================
-   ROOT ROUTE
-========================= */
 app.get("/", (req, res) => {
-  res.send("Backend is running 🚀");
+  res.send("Backend is running");
 });
 
-/* =========================
-   404 HANDLER
-========================= */
 app.use((req, res) => {
-  res.status(404).json({
-    message: "Route not found",
-  });
+  res.status(404).json({ message: "Route not found" });
 });
 
-/* =========================
-   GLOBAL ERROR HANDLER
-========================= */
-app.use((err, req, res, next) => {
-  console.error("SERVER ERROR:", err);
-
-  res.status(500).json({
-    message: err.message || "Internal Server Error",
-  });
+app.use((err, req, res, _next) => {
+  console.error("SERVER ERROR:", err.message || err);
+  res.status(500).json({ message: err.message || "Internal Server Error" });
 });
 
-/* =========================
-   START SERVER (RENDER READY)
-========================= */
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`Server running on port ${PORT}`);
 });
