@@ -40,6 +40,7 @@ DB_SSL=false
 FRONTEND_URL=http://localhost:5173
 CORS_ORIGINS=http://localhost:5173
 GROQ_API_KEY=
+RESEND_API_KEY=re_xxx
 EMAIL_USER=youremail@gmail.com
 EMAIL_PASS=your_gmail_app_password
 EMAIL_FROM=Smart Study <youremail@gmail.com>
@@ -78,6 +79,8 @@ CORS_ORIGINS=https://your-vercel-app.vercel.app
 DATABASE_URL=mysql://user:password@host:3306/database
 DB_SSL=true
 GROQ_API_KEY=optional_key
+RESEND_API_KEY=re_xxx
+RESEND_API_KEY=re_xxx
 EMAIL_USER=youremail@gmail.com
 EMAIL_PASS=your_gmail_app_password
 EMAIL_FROM=Smart Study <youremail@gmail.com>
@@ -124,3 +127,14 @@ ALTER TABLE users
 ```
 
 For Gmail SMTP, enable 2-Step Verification and create an App Password. Use that app password as `EMAIL_PASS`.
+
+### Email on Render
+
+If Gmail SMTP times out on Render, use Resend instead:
+
+```env
+RESEND_API_KEY=re_xxx
+EMAIL_FROM=Smart Study <noreply@your-verified-domain.com>
+```
+
+`RESEND_API_KEY` is preferred by the backend. Gmail SMTP is only used when `RESEND_API_KEY` is not set.

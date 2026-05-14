@@ -21,10 +21,13 @@
         value: "true"
       - key: GROQ_API_KEY
         sync: false
+      - key: RESEND_API_KEY
+        sync: false
       - key: EMAIL_USER
         sync: false
       - key: EMAIL_PASS
         sync: false
       - key: EMAIL_FROM
         sync: false
+
 
