@@ -11,7 +11,7 @@ const Subjects = lazy(() => import("../pages/Subjects"));
 const StudyPlans = lazy(() => import("../pages/StudyPlans"));
 const Tasks = lazy(() => import("../pages/Tasks"));
 const Progress = lazy(() => import("../pages/Progress"));
-const AISupport = lazy(() => import("../pages/Aisupports"));
+const AISupport = lazy(() => import("../pages/AIsupports"));
 const Settings = lazy(() => import("../pages/Settings"));
 
 function FullScreenLoader() {
