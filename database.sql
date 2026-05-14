@@ -1,4 +1,4 @@
--- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
+﻿-- MariaDB dump 10.19  Distrib 10.4.32-MariaDB, for Win64 (AMD64)
 --
 -- Host: localhost    Database: smart_study_planner
 -- ------------------------------------------------------
@@ -149,7 +149,9 @@ CREATE TABLE `users` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
   `email` varchar(255) NOT NULL,
-  `password` varchar(255) NOT NULL,
+  password varchar(255) NOT NULL,
+  eset_token text DEFAULT NULL,
+  eset_token_expire bigint(20) DEFAULT NULL,
   `dark_mode` tinyint(1) DEFAULT 0,
   `compact_ui` tinyint(1) DEFAULT 0,
   `language` varchar(10) DEFAULT 'vi',
@@ -184,3 +186,4 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2026-05-13 13:42:01
+

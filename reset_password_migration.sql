@@ -1,0 +1,3 @@
+﻿ALTER TABLE users
+  ADD COLUMN reset_token TEXT DEFAULT NULL,
+  ADD COLUMN reset_token_expire BIGINT DEFAULT NULL;

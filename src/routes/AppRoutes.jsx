@@ -1,11 +1,5 @@
 ﻿import { Suspense, lazy } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import { useAuth } from "../context/useAuth";
 import MainLayout from "../layout/MainLayout";
 
@@ -13,115 +7,46 @@ import Home from "../pages/Home";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
 import ForgotPassword from "../pages/ForgotPassword";
+import ResetPassword from "../pages/ResetPassword";
 
-const Subjects = lazy(() =>
-  import("../pages/Subjects")
-);
-
-const StudyPlans = lazy(() =>
-  import("../pages/StudyPlans")
-);
-
-const Tasks = lazy(() =>
-  import("../pages/Tasks")
-);
-
-const Progress = lazy(() =>
-  import("../pages/Progress")
-);
-
-const AISupport = lazy(() =>
-  import("../pages/AIsupports")
-);
-
-const Settings = lazy(() =>
-  import("../pages/Settings")
-);
+const Subjects = lazy(() => import("../pages/Subjects"));
+const StudyPlans = lazy(() => import("../pages/StudyPlans"));
+const Tasks = lazy(() => import("../pages/Tasks"));
+const Progress = lazy(() => import("../pages/Progress"));
+const AISupport = lazy(() => import("../pages/AIsupports"));
+const Settings = lazy(() => import("../pages/Settings"));
 
 function FullScreenLoader() {
   return (
     <div className="flex h-screen items-center justify-center bg-[#F5F7FB]">
       <div className="text-center">
         <div className="mx-auto mb-3 h-10 w-10 animate-spin rounded-full border-4 border-blue-400 border-t-transparent" />
-
-        <p className="text-sm text-gray-500">
-          Đang tải...
-        </p>
+        <p className="text-sm text-gray-500">Đang tải...</p>
       </div>
     </div>
   );
 }
 
-function PrivateRoute({
-  children,
-}) {
+function PrivateRoute({ children }) {
   const { user } = useAuth();
-
-  if (!user) {
-    return (
-      <Navigate
-        to="/login"
-        replace
-      />
-    );
-  }
-
+  if (!user) return <Navigate to="/login" replace />;
   return children;
 }
 
 export default function AppRoutes() {
-  const { user, loading } =
-    useAuth();
+  const { user, loading } = useAuth();
 
-  if (loading) {
-    return <FullScreenLoader />;
-  }
+  if (loading) return <FullScreenLoader />;
 
   return (
     <BrowserRouter>
-      <Suspense
-        fallback={
-          <FullScreenLoader />
-        }
-      >
+      <Suspense fallback={<FullScreenLoader />}>
         <Routes>
-          {/* PUBLIC */}
-          <Route
-            path="/login"
-            element={
-              user ? (
-                <Navigate
-                  to="/"
-                  replace
-                />
-              ) : (
-                <Login />
-              )
-            }
-          />
+          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
+          <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
 
-          <Route
-            path="/register"
-            element={
-              user ? (
-                <Navigate
-                  to="/"
-                  replace
-                />
-              ) : (
-                <Register />
-              )
-            }
-          />
-
-          <Route
-            path="/forgot-password"
-            element={
-              <ForgotPassword />
-            }
-          />
-
-          {/* PRIVATE */}
           <Route
             element={
               <PrivateRoute>
@@ -129,52 +54,16 @@ export default function AppRoutes() {
               </PrivateRoute>
             }
           >
-            <Route
-              index
-              element={<Home />}
-            />
-
-            <Route
-              path="subjects"
-              element={<Subjects />}
-            />
-
-            <Route
-              path="study-plans"
-              element={<StudyPlans />}
-            />
-
-            <Route
-              path="tasks"
-              element={<Tasks />}
-            />
-
-            <Route
-              path="progress"
-              element={<Progress />}
-            />
-
-            <Route
-              path="ai-support"
-              element={<AISupport />}
-            />
-
-            <Route
-              path="settings"
-              element={<Settings />}
-            />
+            <Route index element={<Home />} />
+            <Route path="subjects" element={<Subjects />} />
+            <Route path="study-plans" element={<StudyPlans />} />
+            <Route path="tasks" element={<Tasks />} />
+            <Route path="progress" element={<Progress />} />
+            <Route path="ai-support" element={<AISupport />} />
+            <Route path="settings" element={<Settings />} />
           </Route>
 
-          {/* FALLBACK */}
-          <Route
-            path="*"
-            element={
-              <Navigate
-                to="/"
-                replace
-              />
-            }
-          />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Suspense>
     </BrowserRouter>

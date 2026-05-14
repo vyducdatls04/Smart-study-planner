@@ -40,6 +40,9 @@ DB_SSL=false
 FRONTEND_URL=http://localhost:5173
 CORS_ORIGINS=http://localhost:5173
 GROQ_API_KEY=
+EMAIL_USER=youremail@gmail.com
+EMAIL_PASS=your_gmail_app_password
+EMAIL_FROM=Smart Study <youremail@gmail.com>
 ```
 
 ### 3. Frontend
@@ -75,6 +78,9 @@ CORS_ORIGINS=https://your-vercel-app.vercel.app
 DATABASE_URL=mysql://user:password@host:3306/database
 DB_SSL=true
 GROQ_API_KEY=optional_key
+EMAIL_USER=youremail@gmail.com
+EMAIL_PASS=your_gmail_app_password
+EMAIL_FROM=Smart Study <youremail@gmail.com>
 ```
 
 Render does not provide MySQL by default. Use a hosted MySQL provider such as Railway, Aiven, PlanetScale-compatible MySQL, or any MySQL server that exposes a connection URL.
@@ -106,3 +112,15 @@ Password: 123456
 npm run lint
 npm run build
 ```
+
+## Password Reset
+
+Before using forgot password, update the users table:
+
+```sql
+ALTER TABLE users
+  ADD COLUMN reset_token TEXT DEFAULT NULL,
+  ADD COLUMN reset_token_expire BIGINT DEFAULT NULL;
+```
+
+For Gmail SMTP, enable 2-Step Verification and create an App Password. Use that app password as `EMAIL_PASS`.
