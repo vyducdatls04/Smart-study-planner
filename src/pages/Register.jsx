@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import logo from "../assets/logo.png";
 import api from "../api/axios";
@@ -58,10 +58,7 @@ export default function Register() {
       });
 
       setSuccess("Đăng ký thành công! Đang chuyển sang đăng nhập...");
-
-      setTimeout(() => {
-        navigate("/login");
-      }, 1000);
+      setTimeout(() => navigate("/login"), 1000);
     } catch (err) {
       setError(err?.response?.data?.message || "Đăng ký thất bại");
     } finally {
@@ -72,29 +69,21 @@ export default function Register() {
   return (
     <div className="min-h-screen bg-[#F5F7FB] lg:grid lg:grid-cols-2">
       <div className="hidden bg-[#CFE8B4] px-10 lg:flex lg:flex-col lg:items-center lg:justify-center">
-        <div className="text-center">
-          <img
-            src={logo}
-            alt="Smart Study"
-            className="mx-auto mb-6 h-45 w-45 object-contain"
-          />
-
-          
-        </div>
+        <img
+          src={logo}
+          alt="Smart Study"
+          className="w-80 max-w-full object-contain xl:w-96"
+        />
       </div>
 
       <div className="flex min-h-screen items-center justify-center px-5 py-8">
         <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-7 shadow-sm sm:p-8">
-          <div className="mb-7 text-center lg:hidden">
+          <div className="mb-7 flex justify-center lg:hidden">
             <img
               src={logo}
               alt="Smart Study"
-              className="mx-auto mb-4 h-20 w-20 object-contain"
+              className="w-48 max-w-full object-contain"
             />
-
-            <h1 className="text-2xl font-semibold text-gray-900">
-              Smart Study
-            </h1>
           </div>
 
           <div className="mb-6">

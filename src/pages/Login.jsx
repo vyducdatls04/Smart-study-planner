@@ -73,13 +73,13 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-[#F5F7FB] lg:grid lg:grid-cols-2">
       <div className="hidden bg-[#A8D5D0] px-10 lg:flex lg:flex-col lg:items-center lg:justify-center">
-        <img src={logo} alt="logo" className="h-48 w-48 object-contain" />
+        <img src={logo} alt="logo" className="w-80 max-w-full object-contain xl:w-96" />
       </div>
 
       <div className="flex min-h-screen items-center justify-center px-5 py-8">
         <div className="w-full max-w-md rounded-2xl border border-gray-100 bg-white p-7 shadow-sm sm:p-8">
           <div className="mb-7 flex justify-center lg:hidden">
-            <img src={logo} alt="logo" className="h-36 w-36 object-contain" />
+            <img src={logo} alt="logo" className="w-48 max-w-full object-contain" />
           </div>
 
           <div className="mb-6">
@@ -160,3 +160,4 @@ function InputWithIcon({ icon, type, placeholder, value, onChange, onEnter }) {
     </div>
   );
 }
+
