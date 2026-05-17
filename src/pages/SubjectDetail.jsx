@@ -86,7 +86,7 @@ export default function SubjectDetail() {
   // task completed
   const completedTasks =
     tasks.filter(
-      (task) => task.completed
+      (task) => task.status === "done"
     ).length;
 
   // deadline gần nhất
@@ -124,7 +124,7 @@ export default function SubjectDetail() {
 
         <div className="space-y-1 text-sm">
           <p>
-            Tổng task: {tasks.length}
+            Tổng công việc: {tasks.length}
           </p>
 
           <p>
@@ -147,7 +147,7 @@ export default function SubjectDetail() {
 
         {tasks.length === 0 ? (
           <p className="text-gray-500">
-            Chưa có task nào.
+            Chưa có công việc nào.
           </p>
         ) : (
           <div className="space-y-4">
@@ -171,17 +171,17 @@ export default function SubjectDetail() {
                   <div className="text-right">
                     <p className="text-xs text-gray-400">
                       {task.deadline ||
-                        "Không có deadline"}
+                        "Không có hạn"}
                     </p>
 
                     <span
                       className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-medium text-white ${
-                        task.completed
+                        task.status === "done"
                           ? "bg-green-500"
                           : "bg-orange-500"
                       }`}
                     >
-                      {task.completed
+                      {task.status === "done"
                         ? "Hoàn thành"
                         : "Chưa hoàn thành"}
                     </span>

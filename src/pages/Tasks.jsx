@@ -32,10 +32,16 @@ const getDeadlineLabel = (deadline) => {
 
 export default function Tasks() {
   const [tasks, setTasks] = useState([]);
+  const [subjects, setSubjects] = useState([]);
   const [filter, setFilter] = useState("all");
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState({ title: "", deadline: getTodayStr(), priority: "medium" });
+  const [form, setForm] = useState({
+    title: "",
+    deadline: getTodayStr(),
+    priority: "medium",
+    subject_id: "",
+  });
 
   const fetchTasks = useCallback(async () => {
     try {
@@ -52,6 +58,19 @@ export default function Tasks() {
   useEffect(() => {
     fetchTasks();
   }, [fetchTasks]);
+
+  useEffect(() => {
+    const fetchSubjects = async () => {
+      try {
+        const res = await api.get("/subjects");
+        setSubjects(res.data || []);
+      } catch (err) {
+        console.error("Lỗi tải môn học:", err);
+      }
+    };
+
+    fetchSubjects();
+  }, []);
 
   const toggleStatus = useCallback(async (task) => {
     try {
@@ -94,9 +113,15 @@ export default function Tasks() {
       Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Vui lòng nhập tên công việc!' });
       return;
     }
+
+    if (!form.subject_id) {
+      Swal.fire({ icon: 'warning', title: 'Thông báo', text: 'Vui lòng chọn môn học!' });
+      return;
+    }
+
     try {
       await api.post("/tasks", { ...form, status: "pending" });
-      setForm({ title: "", deadline: getTodayStr(), priority: "medium" });
+      setForm({ title: "", deadline: getTodayStr(), priority: "medium", subject_id: "" });
       setShowForm(false);
       fetchTasks();
       Swal.fire({ icon: 'success', title: 'Thành công', timer: 1000, showConfirmButton: false });
@@ -138,8 +163,16 @@ export default function Tasks() {
 
       {showForm && (
         <section className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
-          <div className="grid gap-3 lg:grid-cols-[1fr_180px_170px_auto]">
+          <div className="grid gap-3 lg:grid-cols-[1fr_190px_180px_170px_auto]">
             <input type="text" placeholder="Tên công việc..." value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onKeyDown={(e) => e.key === "Enter" && addTask()} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-blue-400 transition" />
+            <select value={form.subject_id} onChange={(e) => setForm({ ...form, subject_id: e.target.value })} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none">
+              <option value="">Chọn môn học</option>
+              {subjects.map((subject) => (
+                <option key={subject.id} value={subject.id}>
+                  {subject.name}
+                </option>
+              ))}
+            </select>
             <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-blue-400 transition" />
             <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none">
               <option value="high">Cao</option>
