@@ -28,6 +28,12 @@ const RANGE_OPTIONS = [
   { key: "year", label: "Năm nay" },
 ];
 
+const EXPORT_FILE_NAMES = {
+  week: "bao-cao-tien-do-tuan-nay.csv",
+  month: "bao-cao-tien-do-thang-nay.csv",
+  year: "bao-cao-tien-do-nam-nay.csv",
+};
+
 export default function Progress() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -63,7 +69,7 @@ export default function Progress() {
       const link = document.createElement("a");
 
       link.href = url;
-      link.download = `progress-${range}.csv`;
+      link.download = EXPORT_FILE_NAMES[range] || "bao-cao-tien-do.csv";
 
       document.body.appendChild(link);
       link.click();
