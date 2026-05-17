@@ -70,25 +70,46 @@ export const getDashboard = async (req, res) => {
       todayTasks: todayTasks.count,
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    console.error(err);
+
+    return res.status(500).json({
+      message: err.message,
+    });
   }
 };
 
 export const getProgress = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const range = req.query.range || "month";
+
     const rangeConfig = getRangeConfig(range);
 
     const [[taskStats]] = await db.query(
       `
       SELECT
         COUNT(*) AS total,
-        SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END) AS completed,
-        SUM(CASE WHEN status = 'pending' THEN 1 ELSE 0 END) AS pending
+
+        SUM(
+          CASE
+            WHEN status = 'done'
+            THEN 1
+            ELSE 0
+          END
+        ) AS completed,
+
+        SUM(
+          CASE
+            WHEN status = 'pending'
+            THEN 1
+            ELSE 0
+          END
+        ) AS pending
+
       FROM tasks
+
       WHERE user_id = ?
-      AND deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
       `,
       [userId]
     );
@@ -107,15 +128,27 @@ export const getProgress = async (req, res) => {
       SELECT
         s.id,
         s.name,
+
         COUNT(t.id) AS total,
-        SUM(CASE WHEN t.status = 'done' THEN 1 ELSE 0 END) AS completed
+
+        SUM(
+          CASE
+            WHEN t.status = 'done'
+            THEN 1
+            ELSE 0
+          END
+        ) AS completed
+
       FROM subjects s
+
       LEFT JOIN tasks t
         ON t.subject_id = s.id
         AND t.user_id = ?
-        AND t.deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
+
       WHERE s.user_id = ?
+
       GROUP BY s.id, s.name
+
       ORDER BY s.name ASC
       `,
       [userId, userId]
@@ -124,38 +157,54 @@ export const getProgress = async (req, res) => {
     const [studyHours] = await db.query(
       `
       SELECT
-        DATE_FORMAT(deadline, '${rangeConfig.groupFormat}') AS day,
+        DATE_FORMAT(
+          COALESCE(deadline, CURDATE()),
+          '${rangeConfig.groupFormat}'
+        ) AS day,
+
         COUNT(*) AS tasks
+
       FROM tasks
+
       WHERE user_id = ?
-      AND deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
+
       GROUP BY day
-      ORDER BY MIN(deadline) ASC
+
+      ORDER BY MIN(COALESCE(deadline, CURDATE())) ASC
       `,
       [userId]
     );
 
     const total = Number(taskStats.total || 0);
+
     const completed = Number(taskStats.completed || 0);
+
     const pending = Number(taskStats.pending || 0);
 
     const overallProgress =
-      total > 0 ? Math.round((completed / total) * 100) : 0;
+      total > 0
+        ? Math.round((completed / total) * 100)
+        : 0;
 
     const pendingPercent =
-      total > 0 ? Math.round((pending / total) * 100) : 0;
+      total > 0
+        ? Math.round((pending / total) * 100)
+        : 0;
 
     const subjectTotal = Number(subjectStats.total || 0);
 
     const subjectProgress = subjects.map((subject) => {
       const subjectTaskTotal = Number(subject.total || 0);
+
       const subjectCompleted = Number(subject.completed || 0);
 
       return {
         name: subject.name,
         percent:
           subjectTaskTotal > 0
-            ? Math.round((subjectCompleted / subjectTaskTotal) * 100)
+            ? Math.round(
+                (subjectCompleted / subjectTaskTotal) * 100
+              )
             : 0,
       };
     });
@@ -166,17 +215,26 @@ export const getProgress = async (req, res) => {
 
     return res.json({
       overallProgress,
+
       totalStudyTime: `${completed} công việc`,
+
       studyTimeChange: "+0 giờ",
+
       tasksCompleted: completed,
+
       tasksTotal: total,
+
       subjectsMastered,
+
       subjectsTotal: subjectTotal,
+
       subjects: subjectProgress,
+
       studyHours: studyHours.map((item) => ({
         day: item.day,
         hours: Number(item.tasks || 0),
       })),
+
       achievements: [
         {
           icon: "✓",
@@ -191,35 +249,51 @@ export const getProgress = async (req, res) => {
           value: `${overallProgress}%`,
         },
       ],
+
       performance: {
         completed: {
           count: completed,
           percent: overallProgress,
         },
+
         pending: {
           count: pending,
           percent: pendingPercent,
         },
+
         inProgress: {
           count: 0,
           percent: 0,
         },
+
         averageScore: overallProgress,
       },
     });
   } catch (err) {
-    return res.status(500).json({ message: err.message });
+    console.error(err);
+
+    return res.status(500).json({
+      message: err.message,
+    });
   }
 };
 
 export const exportProgress = async (req, res) => {
   try {
     const userId = req.user.id;
+
     const range = req.query.range || "month";
+
     const rangeConfig = getRangeConfig(range);
 
     const [[user]] = await db.query(
-      "SELECT name, email FROM users WHERE id = ?",
+      `
+      SELECT
+        name,
+        email
+      FROM users
+      WHERE id = ?
+      `,
       [userId]
     );
 
@@ -228,46 +302,59 @@ export const exportProgress = async (req, res) => {
       SELECT
         COUNT(*) AS total,
 
-        SUM(CASE
-          WHEN status = 'done'
-          THEN 1
-          ELSE 0
-        END) AS completed,
+        SUM(
+          CASE
+            WHEN status = 'done'
+            THEN 1
+            ELSE 0
+          END
+        ) AS completed,
 
-        SUM(CASE
-          WHEN status = 'pending'
-          THEN 1
-          ELSE 0
-        END) AS pending,
+        SUM(
+          CASE
+            WHEN status = 'pending'
+            THEN 1
+            ELSE 0
+          END
+        ) AS pending,
 
-        SUM(CASE
-          WHEN status = 'pending'
-          AND deadline < CURDATE()
-          THEN 1
-          ELSE 0
-        END) AS overdue,
+        SUM(
+          CASE
+            WHEN status = 'pending'
+            AND deadline IS NOT NULL
+            AND deadline < CURDATE()
+            THEN 1
+            ELSE 0
+          END
+        ) AS overdue,
 
-        SUM(CASE
-          WHEN priority = 'high'
-          THEN 1
-          ELSE 0
-        END) AS highPriority,
+        SUM(
+          CASE
+            WHEN priority = 'high'
+            THEN 1
+            ELSE 0
+          END
+        ) AS highPriority,
 
-        SUM(CASE
-          WHEN priority = 'medium'
-          THEN 1
-          ELSE 0
-        END) AS mediumPriority,
+        SUM(
+          CASE
+            WHEN priority = 'medium'
+            THEN 1
+            ELSE 0
+          END
+        ) AS mediumPriority,
 
-        SUM(CASE
-          WHEN priority = 'low'
-          THEN 1
-          ELSE 0
-        END) AS lowPriority
+        SUM(
+          CASE
+            WHEN priority = 'low'
+            THEN 1
+            ELSE 0
+          END
+        ) AS lowPriority
 
       FROM tasks
+
       WHERE user_id = ?
-      AND deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
       `,
       [userId]
     );
@@ -276,29 +363,35 @@ export const exportProgress = async (req, res) => {
       `
       SELECT
         s.name,
+
         COUNT(t.id) AS total,
 
-        SUM(CASE
-          WHEN t.status = 'done'
-          THEN 1
-          ELSE 0
-        END) AS completed,
+        SUM(
+          CASE
+            WHEN t.status = 'done'
+            THEN 1
+            ELSE 0
+          END
+        ) AS completed,
 
-        SUM(CASE
-          WHEN t.status = 'pending'
-          THEN 1
-          ELSE 0
-        END) AS pending
+        SUM(
+          CASE
+            WHEN t.status = 'pending'
+            THEN 1
+            ELSE 0
+          END
+        ) AS pending
 
       FROM subjects s
+
       LEFT JOIN tasks t
         ON t.subject_id = s.id
         AND t.user_id = ?
-        AND t.deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
 
       WHERE s.user_id = ?
 
       GROUP BY s.id, s.name
+
       ORDER BY s.name ASC
       `,
       [userId, userId]
@@ -307,27 +400,36 @@ export const exportProgress = async (req, res) => {
     const [dailyStats] = await db.query(
       `
       SELECT
-        DATE_FORMAT(deadline, '%d/%m/%Y') AS day,
+        DATE_FORMAT(
+          COALESCE(deadline, CURDATE()),
+          '%d/%m/%Y'
+        ) AS day,
+
         COUNT(*) AS total,
 
-        SUM(CASE
-          WHEN status = 'done'
-          THEN 1
-          ELSE 0
-        END) AS completed,
+        SUM(
+          CASE
+            WHEN status = 'done'
+            THEN 1
+            ELSE 0
+          END
+        ) AS completed,
 
-        SUM(CASE
-          WHEN status = 'pending'
-          THEN 1
-          ELSE 0
-        END) AS pending
+        SUM(
+          CASE
+            WHEN status = 'pending'
+            THEN 1
+            ELSE 0
+          END
+        ) AS pending
 
       FROM tasks
-      WHERE user_id = ?
-      AND deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
 
-      GROUP BY DATE(deadline)
-      ORDER BY DATE(deadline) ASC
+      WHERE user_id = ?
+
+      GROUP BY DATE(COALESCE(deadline, CURDATE()))
+
+      ORDER BY DATE(COALESCE(deadline, CURDATE())) ASC
       `,
       [userId]
     );
@@ -336,12 +438,20 @@ export const exportProgress = async (req, res) => {
       `
       SELECT
         t.title,
-        DATE_FORMAT(t.deadline, '%d/%m/%Y') AS deadline,
-        t.priority,
-        t.status,
+
+        CASE
+          WHEN t.deadline IS NOT NULL
+          THEN DATE_FORMAT(t.deadline, '%d/%m/%Y')
+          ELSE ''
+        END AS deadline,
+
+        COALESCE(t.priority, 'medium') AS priority,
+
+        COALESCE(t.status, 'pending') AS status,
 
         CASE
           WHEN t.status = 'pending'
+          AND t.deadline IS NOT NULL
           AND t.deadline < CURDATE()
           THEN 'Quá hạn'
 
@@ -355,7 +465,10 @@ export const exportProgress = async (req, res) => {
           ELSE 'Đang theo dõi'
         END AS note,
 
-        COALESCE(s.name, 'Chưa gắn môn học') AS subjectName
+        COALESCE(
+          s.name,
+          'Chưa gắn môn học'
+        ) AS subjectName
 
       FROM tasks t
 
@@ -363,48 +476,80 @@ export const exportProgress = async (req, res) => {
         ON s.id = t.subject_id
 
       WHERE t.user_id = ?
-      AND t.deadline >= DATE_SUB(CURDATE(), ${rangeConfig.intervalSql})
 
-      ORDER BY t.deadline ASC, t.status ASC, t.priority ASC
+      ORDER BY
+        t.deadline IS NULL,
+        t.deadline ASC
       `,
       [userId]
     );
 
     const total = Number(taskStats.total || 0);
+
     const completed = Number(taskStats.completed || 0);
+
     const pending = Number(taskStats.pending || 0);
 
     const progress =
-      total > 0 ? Math.round((completed / total) * 100) : 0;
+      total > 0
+        ? Math.round((completed / total) * 100)
+        : 0;
 
     const rows = [
       ["SMART STUDY PLANNER - BÁO CÁO TIẾN ĐỘ HỌC TẬP"],
+
       ["Ngày xuất", formatExportDateTime()],
+
       ["Khoảng thời gian", rangeConfig.label],
+
       ["Người dùng", user?.name || "Không rõ"],
+
       ["Email", user?.email || "Không rõ"],
+
       [],
+
       ["TỔNG QUAN"],
+
       ["Chỉ số", "Giá trị"],
+
       ["Tổng công việc", total],
+
       ["Đã hoàn thành", completed],
+
       ["Chưa hoàn thành", pending],
+
       ["Quá hạn", Number(taskStats.overdue || 0)],
+
       ["Tiến độ hoàn thành", `${progress}%`],
+
       ["Ưu tiên cao", Number(taskStats.highPriority || 0)],
+
       ["Ưu tiên trung bình", Number(taskStats.mediumPriority || 0)],
+
       ["Ưu tiên thấp", Number(taskStats.lowPriority || 0)],
+
       [],
+
       ["TIẾN ĐỘ THEO MÔN"],
-      ["Môn học", "Tổng công việc", "Hoàn thành", "Chưa hoàn thành", "Tiến độ"],
+
+      [
+        "Môn học",
+        "Tổng công việc",
+        "Hoàn thành",
+        "Chưa hoàn thành",
+        "Tiến độ",
+      ],
 
       ...subjects.map((subject) => {
         const subjectTotal = Number(subject.total || 0);
+
         const subjectCompleted = Number(subject.completed || 0);
 
         const subjectProgress =
           subjectTotal > 0
-            ? Math.round((subjectCompleted / subjectTotal) * 100)
+            ? Math.round(
+                (subjectCompleted / subjectTotal) * 100
+              )
             : 0;
 
         return [
@@ -417,8 +562,15 @@ export const exportProgress = async (req, res) => {
       }),
 
       [],
+
       ["THỐNG KÊ THEO NGÀY"],
-      ["Ngày", "Tổng công việc", "Hoàn thành", "Chưa hoàn thành"],
+
+      [
+        "Ngày",
+        "Tổng công việc",
+        "Hoàn thành",
+        "Chưa hoàn thành",
+      ],
 
       ...dailyStats.map((day) => [
         day.day,
@@ -428,8 +580,18 @@ export const exportProgress = async (req, res) => {
       ]),
 
       [],
+
       ["DANH SÁCH CÔNG VIỆC"],
-      ["STT", "Công việc", "Môn học", "Hạn", "Độ ưu tiên", "Trạng thái", "Ghi chú"],
+
+      [
+        "STT",
+        "Công việc",
+        "Môn học",
+        "Hạn",
+        "Độ ưu tiên",
+        "Trạng thái",
+        "Ghi chú",
+      ],
 
       ...tasks.map((task, index) => [
         index + 1,
@@ -443,10 +605,15 @@ export const exportProgress = async (req, res) => {
     ];
 
     const csv = rows
-      .map((row) => row.map(toCsvValue).join(","))
+      .map((row) =>
+        row.map(toCsvValue).join(",")
+      )
       .join("\r\n");
 
-    res.setHeader("Content-Type", "text/csv; charset=utf-8");
+    res.setHeader(
+      "Content-Type",
+      "text/csv; charset=utf-8"
+    );
 
     res.setHeader(
       "Content-Disposition",
@@ -455,10 +622,12 @@ export const exportProgress = async (req, res) => {
 
     return res.send(`\uFEFF${csv}`);
   } catch (err) {
-    console.error("EXPORT ERROR:", err);
+    console.error("EXPORT ERROR FULL:", err);
 
     return res.status(500).json({
+      success: false,
       message: err.message,
+      stack: err.stack,
     });
   }
 };
