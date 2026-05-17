@@ -1,4 +1,5 @@
 ﻿import { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 
 import api from "../api/axios";
@@ -294,7 +295,19 @@ export default function Subjects() {
           </p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <motion.div
+          initial="hidden"
+          animate="visible"
+          variants={{
+            hidden: {},
+            visible: {
+              transition: {
+                staggerChildren: 0.045,
+              },
+            },
+          }}
+          className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3"
+        >
           {subjects.map((subject) => (
             <SubjectCard
               key={subject.id}
@@ -306,7 +319,7 @@ export default function Subjects() {
               }
             />
           ))}
-        </div>
+        </motion.div>
       )}
     </div>
   );
@@ -322,9 +335,15 @@ function SubjectCard({
     subject.color || DEFAULT_COLOR;
 
   return (
-    <div
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 12 },
+        visible: { opacity: 1, y: 0 },
+      }}
+      whileHover={{ y: -4 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
       onClick={() => onView(subject.id)}
-      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-100 hover:shadow-lg"
+      className="group relative cursor-pointer overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:border-blue-100 hover:shadow-lg"
     >
       <div
         className="absolute left-0 top-0 h-full w-1.5 transition-all duration-200 group-hover:w-2"
@@ -387,6 +406,6 @@ function SubjectCard({
           </button>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

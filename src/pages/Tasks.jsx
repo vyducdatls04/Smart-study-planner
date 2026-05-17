@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import api from "../api/axios";
 import Swal from "sweetalert2";
 import {
@@ -161,8 +162,15 @@ export default function Tasks() {
         <StatCard label="Tiến độ" value={`${stats.progress}%`} icon={<Target size={20} />} color="bg-violet-50" textColor="text-violet-700" iconBg="bg-violet-100" progress={stats.progress} />
       </div>
 
-      {showForm && (
-        <section className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <AnimatePresence>
+        {showForm && (
+        <motion.section
+          initial={{ opacity: 0, y: -10, height: 0 }}
+          animate={{ opacity: 1, y: 0, height: "auto" }}
+          exit={{ opacity: 0, y: -8, height: 0 }}
+          transition={{ duration: 0.22, ease: "easeOut" }}
+          className="mb-6 overflow-hidden rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+        >
           <div className="grid gap-3 lg:grid-cols-[1fr_190px_180px_170px_auto]">
             <input type="text" placeholder="Tên công việc..." value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onKeyDown={(e) => e.key === "Enter" && addTask()} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-blue-400 transition" />
             <select value={form.subject_id} onChange={(e) => setForm({ ...form, subject_id: e.target.value })} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none">
@@ -181,8 +189,9 @@ export default function Tasks() {
             </select>
             <button onClick={addTask} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-5 text-sm font-medium text-white transition hover:bg-blue-700"><Check size={17} /> Lưu</button>
           </div>
-        </section>
-      )}
+        </motion.section>
+        )}
+      </AnimatePresence>
 
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -202,9 +211,11 @@ export default function Tasks() {
             {filteredTasks.length === 0 ? (
                <div className="py-12 text-center text-sm text-gray-400 border border-dashed rounded-2xl">Trống</div>
             ) : (
-              filteredTasks.map((task) => (
-                <TaskRow key={task.id} task={task} onToggle={toggleStatus} onDelete={deleteTask} />
-              ))
+              <AnimatePresence initial={false}>
+                {filteredTasks.map((task) => (
+                  <TaskRow key={task.id} task={task} onToggle={toggleStatus} onDelete={deleteTask} />
+                ))}
+              </AnimatePresence>
             )}
           </div>
         )}
@@ -217,7 +228,14 @@ function TaskRow({ task, onToggle, onDelete }) {
   const dl = getDeadlineLabel(task.deadline);
   const priority = PRIORITY_CONFIG[task.priority] || PRIORITY_CONFIG.medium;
   return (
-    <div className={`group flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 transition hover:bg-white hover:shadow-sm ${task.status === "done" ? "opacity-70" : ""}`}>
+    <motion.div
+      layout
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: task.status === "done" ? 0.7 : 1, y: 0 }}
+      exit={{ opacity: 0, y: -8 }}
+      transition={{ duration: 0.18 }}
+      className="group flex items-center gap-3 rounded-2xl border border-gray-100 bg-gray-50 px-4 py-3 transition hover:bg-white hover:shadow-sm"
+    >
       <button onClick={() => onToggle(task)} className={`grid h-8 w-8 place-items-center rounded-full border-2 transition ${task.status === "done" ? "border-blue-600 bg-blue-600 text-white" : "border-gray-300 text-gray-300"}`}>
         {task.status === "done" ? <Check size={16} /> : <Circle size={16} />}
       </button>
@@ -229,7 +247,7 @@ function TaskRow({ task, onToggle, onDelete }) {
         </div>
       </div>
       <button onClick={() => onDelete(task.id)} className="text-gray-300 hover:text-red-500 sm:opacity-0 group-hover:opacity-100 transition"><Trash2 size={16} /></button>
-    </div>
+    </motion.div>
   );
 }
 

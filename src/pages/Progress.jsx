@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
+import { motion } from "framer-motion";
 import {
   Award,
   BarChart3,
@@ -174,7 +175,19 @@ export default function Progress() {
         </div>
       </div>
 
-      <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <motion.div
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: {},
+          visible: {
+            transition: {
+              staggerChildren: 0.05,
+            },
+          },
+        }}
+        className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4"
+      >
         <StatCard
           label="Tiến độ tổng quan"
           value={`${overallProgress}%`}
@@ -220,7 +233,7 @@ export default function Progress() {
           textColor="text-violet-700"
           iconBg="bg-violet-100"
         />
-      </div>
+      </motion.div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
         <SectionCard title="Tiến độ theo môn" icon={<BarChart3 size={18} />}>
@@ -377,7 +390,15 @@ function StatCard({
   progressColor,
 }) {
   return (
-    <div className={`${color} rounded-2xl border border-white/70 p-4 shadow-sm`}>
+    <motion.div
+      variants={{
+        hidden: { opacity: 0, y: 12 },
+        visible: { opacity: 1, y: 0 },
+      }}
+      whileHover={{ y: -3 }}
+      transition={{ duration: 0.18, ease: "easeOut" }}
+      className={`${color} rounded-2xl border border-white/70 p-4 shadow-sm`}
+    >
       <div className="mb-4 flex items-center justify-between">
         <div
           className={`grid h-10 w-10 place-items-center rounded-xl ${iconBg} ${textColor}`}
@@ -401,13 +422,19 @@ function StatCard({
       )}
 
       {children}
-    </div>
+    </motion.div>
   );
 }
 
 function SectionCard({ title, icon, children }) {
   return (
-    <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+    <motion.section
+      initial={{ opacity: 0, y: 12 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.25 }}
+      transition={{ duration: 0.22, ease: "easeOut" }}
+      className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm"
+    >
       <div className="mb-5 flex items-center gap-2">
         <div className="grid h-9 w-9 place-items-center rounded-xl bg-blue-50 text-blue-600">
           {icon}
@@ -416,7 +443,7 @@ function SectionCard({ title, icon, children }) {
       </div>
 
       {children}
-    </section>
+    </motion.section>
   );
 }
 
