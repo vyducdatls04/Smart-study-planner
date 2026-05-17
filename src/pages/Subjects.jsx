@@ -1,6 +1,6 @@
-import { useEffect, useState, useCallback } from "react";
+﻿import { useEffect, useState, useCallback } from "react";
 import api from "../api/axios";
-import Swal from 'sweetalert2';
+import Swal from "sweetalert2";
 import {
   BookOpen,
   Check,
@@ -63,18 +63,28 @@ export default function Subjects() {
           name: trimmedName,
           color,
         });
+
         Swal.fire({
-          icon: 'success',
-          title: 'Đã cập nhật',
+          icon: "success",
+          title: "Đã cập nhật",
           timer: 1000,
           showConfirmButton: false,
           toast: true,
-          position: 'top-end'
+          position: "top-end",
         });
       } else {
         await api.post("/subjects", {
           name: trimmedName,
           color,
+        });
+
+        Swal.fire({
+          icon: "success",
+          title: "Đã thêm môn học",
+          timer: 1000,
+          showConfirmButton: false,
+          toast: true,
+          position: "top-end",
         });
       }
 
@@ -82,7 +92,7 @@ export default function Subjects() {
       fetchSubjects();
     } catch (err) {
       console.error(err);
-      Swal.fire('Lỗi', 'Không thể lưu thay đổi', 'error');
+      Swal.fire("Lỗi", "Không thể lưu thay đổi", "error");
     }
   };
 
@@ -90,42 +100,41 @@ export default function Subjects() {
     setName(subject.name);
     setColor(subject.color || DEFAULT_COLOR);
     setEditingId(subject.id);
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleDelete = async (id) => {
     Swal.fire({
-      title: 'Xóa môn học này?',
+      title: "Xóa môn học này?",
       text: "Dữ liệu liên quan sẽ bị xóa vĩnh viễn!",
-      icon: 'warning',
+      icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: '#3b82f6',
-      cancelButtonColor: '#ef4444',
-      confirmButtonText: 'Đồng ý xóa',
-      cancelButtonText: 'Hủy',
-      borderRadius: '16px'
+      confirmButtonColor: "#3b82f6",
+      cancelButtonColor: "#ef4444",
+      confirmButtonText: "Đồng ý xóa",
+      cancelButtonText: "Hủy",
+      borderRadius: "16px",
     }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          await api.delete(`/subjects/${id}`);
-          fetchSubjects();
-          Swal.fire({
-            icon: 'success',
-            title: 'Đã xóa!',
-            timer: 1000,
-            showConfirmButton: false
-          });
-        } catch (err) {
-          console.error(err);
-          Swal.fire('Lỗi', 'Không thể xóa môn học', 'error');
-        }
+      if (!result.isConfirmed) return;
+
+      try {
+        await api.delete(`/subjects/${id}`);
+        fetchSubjects();
+        Swal.fire({
+          icon: "success",
+          title: "Đã xóa!",
+          timer: 1000,
+          showConfirmButton: false,
+        });
+      } catch (err) {
+        console.error(err);
+        Swal.fire("Lỗi", "Không thể xóa môn học", "error");
       }
     });
   };
 
   return (
     <div className="min-h-screen bg-[#F5F7FB] px-5 py-6 lg:px-8">
-      {/* Header */}
       <div className="mb-6 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-2xl font-semibold text-gray-900">Môn học</h1>
@@ -140,13 +149,15 @@ export default function Subjects() {
         </span>
       </div>
 
-      {/* Form Section */}
       <section className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all focus-within:shadow-md">
         <div className="mb-4 flex items-center justify-between">
           <div>
             <h2 className="text-sm font-semibold text-gray-800">
               {editingId ? "Chỉnh sửa môn học" : "Thêm môn học mới"}
             </h2>
+            <p className="mt-1 text-xs text-gray-400">
+              Chọn tên môn và màu để dễ nhận biết trong task, kế hoạch học.
+            </p>
           </div>
 
           {editingId && (
@@ -155,7 +166,7 @@ export default function Subjects() {
               className="inline-flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-xs font-medium text-red-500 transition hover:bg-red-50"
             >
               <X size={14} />
-              Huỷ chỉnh sửa
+              Hủy chỉnh sửa
             </button>
           )}
         </div>
@@ -163,7 +174,7 @@ export default function Subjects() {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
           <input
             type="text"
-            placeholder="Tên môn học (Ví dụ: ReactJS, Python...)"
+            placeholder="Tên môn học, ví dụ: ReactJS, Python..."
             value={name}
             onChange={(e) => setName(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleSubmit()}
@@ -176,14 +187,15 @@ export default function Subjects() {
                 key={itemColor}
                 type="button"
                 onClick={() => setColor(itemColor)}
-                className={`h-8 w-8 rounded-full transition-all flex items-center justify-center ${
-                  color === itemColor ? "ring-2 ring-offset-2 ring-blue-400 scale-110" : "hover:scale-105"
+                aria-label={`Chọn màu ${itemColor}`}
+                className={`flex h-8 w-8 items-center justify-center rounded-full transition-all ${
+                  color === itemColor
+                    ? "scale-110 ring-2 ring-blue-400 ring-offset-2"
+                    : "hover:scale-105"
                 }`}
                 style={{ backgroundColor: itemColor }}
               >
-                {color === itemColor && (
-                  <Check size={14} className="text-white" />
-                )}
+                {color === itemColor && <Check size={14} className="text-white" />}
               </button>
             ))}
           </div>
@@ -192,8 +204,8 @@ export default function Subjects() {
             onClick={handleSubmit}
             className={`inline-flex h-12 items-center justify-center gap-2 rounded-xl px-8 text-sm font-bold text-white shadow-lg transition-all active:scale-95 ${
               editingId
-                ? "bg-emerald-500 hover:bg-emerald-600 shadow-emerald-100"
-                : "bg-blue-600 hover:bg-blue-700 shadow-blue-100"
+                ? "bg-emerald-500 shadow-emerald-100 hover:bg-emerald-600"
+                : "bg-blue-600 shadow-blue-100 hover:bg-blue-700"
             }`}
           >
             {editingId ? <Check size={18} /> : <Plus size={18} />}
@@ -202,10 +214,9 @@ export default function Subjects() {
         </div>
       </section>
 
-      {/* List Section */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 text-gray-400">
-          <Loader2 size={32} className="animate-spin mb-3 text-blue-500" />
+          <Loader2 size={32} className="mb-3 animate-spin text-blue-500" />
           <p className="text-sm">Đang tải dữ liệu...</p>
         </div>
       ) : subjects.length === 0 ? (
@@ -213,7 +224,9 @@ export default function Subjects() {
           <div className="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-2xl bg-gray-50 text-gray-300">
             <BookOpen size={28} />
           </div>
-          <p className="text-gray-500 text-sm italic">Chưa có môn học nào được tạo.</p>
+          <p className="text-sm italic text-gray-500">
+            Chưa có môn học nào được tạo.
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -235,13 +248,16 @@ function SubjectCard({ subject, onEdit, onDelete }) {
   const subjectColor = subject.color || DEFAULT_COLOR;
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all hover:shadow-md hover:-translate-y-1">
-      <div className="absolute top-0 left-0 w-1.5 h-full" style={{ backgroundColor: subjectColor }} />
-      
-      <div className="flex items-center justify-between gap-3">
+    <div className="group relative overflow-hidden rounded-2xl border border-gray-100 bg-white p-4 shadow-sm transition-all duration-200 hover:-translate-y-1 hover:border-blue-100 hover:shadow-lg">
+      <div
+        className="absolute left-0 top-0 h-full w-1.5 transition-all duration-200 group-hover:w-2"
+        style={{ backgroundColor: subjectColor }}
+      />
+
+      <div className="flex items-center justify-between gap-3 pl-1">
         <div className="flex min-w-0 items-center gap-4">
           <div
-            className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl text-lg font-bold text-white shadow-inner"
+            className="grid h-12 w-12 flex-shrink-0 place-items-center rounded-xl text-lg font-bold text-white shadow-inner transition-transform duration-200 group-hover:scale-105"
             style={{ backgroundColor: subjectColor }}
           >
             {subject.name?.charAt(0)?.toUpperCase() || "?"}
@@ -251,23 +267,32 @@ function SubjectCard({ subject, onEdit, onDelete }) {
             <p className="truncate text-sm font-bold text-gray-800">
               {subject.name}
             </p>
-            <p className="mt-0.5 text-[10px] font-mono text-gray-400 uppercase tracking-widest">
+            <p className="mt-0.5 text-[10px] font-mono uppercase tracking-widest text-gray-400">
               {subjectColor}
+            </p>
+            <p className="mt-1 max-h-0 overflow-hidden text-xs text-gray-400 opacity-0 transition-all duration-200 group-hover:max-h-5 group-hover:opacity-100">
+              Trỏ vào để sửa hoặc xóa môn học
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+        <div className="flex translate-x-1 items-center gap-1 opacity-100 transition-all duration-200 sm:opacity-0 sm:group-hover:translate-x-0 sm:group-hover:opacity-100">
           <button
+            type="button"
             onClick={() => onEdit(subject)}
-            className="p-2 rounded-lg text-gray-400 hover:bg-blue-50 hover:text-blue-600 transition-colors"
+            aria-label={`Sửa ${subject.name}`}
+            title="Sửa môn học"
+            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-blue-50 hover:text-blue-600"
           >
             <Edit3 size={16} />
           </button>
 
           <button
+            type="button"
             onClick={() => onDelete(subject.id)}
-            className="p-2 rounded-lg text-gray-400 hover:bg-red-50 hover:text-red-600 transition-colors"
+            aria-label={`Xóa ${subject.name}`}
+            title="Xóa môn học"
+            className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-red-50 hover:text-red-600"
           >
             <Trash2 size={16} />
           </button>
