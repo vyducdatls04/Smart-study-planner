@@ -1,4 +1,5 @@
 ﻿import db from "../config/db.js";
+import ExcelJS from "exceljs";
 
 const RANGE_CONFIG = {
   week: {
@@ -24,16 +25,6 @@ const formatExportDateTime = () =>
     dateStyle: "medium",
     timeStyle: "short",
   }).format(new Date());
-
-const toCsvValue = (value) => {
-  const text = String(value ?? "");
-  return `"${text.replace(/"/g, '""')}"`;
-};
-
-const toStatusLabel = (status) => {
-  if (status === "done") return "Hoàn thành";
-  return "Chưa hoàn thành";
-};
 
 export const getDashboard = async (req, res) => {
   try {
@@ -328,6 +319,8 @@ export const exportProgress = async (req, res) => {
 
         COALESCE(status, 'pending') AS status,
 
+        COALESCE(priority, 'medium') AS priority,
+
         CASE
           WHEN deadline IS NOT NULL
           THEN DATE_FORMAT(deadline, '%d/%m/%Y')
@@ -343,51 +336,186 @@ export const exportProgress = async (req, res) => {
       [userId]
     );
 
-    const rows = [
-      ["SMART STUDY PLANNER"],
+    const workbook = new ExcelJS.Workbook();
 
-      ["Ngày xuất", formatExportDateTime()],
+    workbook.creator = "Smart Study Planner";
 
-      ["Khoảng thời gian", rangeConfig.label],
+    workbook.created = new Date();
 
-      ["Người dùng", user?.name || "Không rõ"],
+    const worksheet = workbook.addWorksheet(
+      "Tiến độ học tập"
+    );
 
-      ["Email", user?.email || "Không rõ"],
+    worksheet.mergeCells("A1:E1");
 
-      [],
+    const titleCell = worksheet.getCell("A1");
 
-      [
-        "ID",
-        "Công việc",
-        "Trạng thái",
-        "Hạn",
-      ],
+    titleCell.value =
+      "SMART STUDY PLANNER - BÁO CÁO TIẾN ĐỘ";
 
-      ...tasks.map((task) => [
-        task.id,
-        task.title,
-        toStatusLabel(task.status),
-        task.deadline,
-      ]),
+    titleCell.font = {
+      bold: true,
+      size: 18,
+      color: {
+        argb: "FFFFFF",
+      },
+    };
+
+    titleCell.alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+
+    titleCell.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: {
+        argb: "2563EB",
+      },
+    };
+
+    worksheet.addRow([]);
+
+    worksheet.addRow([
+      "Người dùng",
+      user?.name || "Không rõ",
+    ]);
+
+    worksheet.addRow([
+      "Email",
+      user?.email || "Không rõ",
+    ]);
+
+    worksheet.addRow([
+      "Khoảng thời gian",
+      rangeConfig.label,
+    ]);
+
+    worksheet.addRow([
+      "Ngày xuất",
+      formatExportDateTime(),
+    ]);
+
+    worksheet.addRow([]);
+
+    worksheet.columns = [
+      {
+        header: "ID",
+        key: "id",
+        width: 10,
+      },
+      {
+        header: "Công việc",
+        key: "title",
+        width: 35,
+      },
+      {
+        header: "Trạng thái",
+        key: "status",
+        width: 22,
+      },
+      {
+        header: "Ưu tiên",
+        key: "priority",
+        width: 20,
+      },
+      {
+        header: "Hạn",
+        key: "deadline",
+        width: 20,
+      },
     ];
 
-    const csv = rows
-      .map((row) =>
-        row.map(toCsvValue).join(",")
-      )
-      .join("\n");
+    tasks.forEach((task) => {
+      worksheet.addRow({
+        id: task.id,
+
+        title: task.title,
+
+        status:
+          task.status === "done"
+            ? "Hoàn thành"
+            : "Chưa hoàn thành",
+
+        priority:
+          task.priority === "high"
+            ? "Cao"
+            : task.priority === "medium"
+            ? "Trung bình"
+            : "Thấp",
+
+        deadline: task.deadline,
+      });
+    });
+
+    const headerRow = worksheet.getRow(8);
+
+    headerRow.font = {
+      bold: true,
+      color: {
+        argb: "FFFFFF",
+      },
+    };
+
+    headerRow.alignment = {
+      vertical: "middle",
+      horizontal: "center",
+    };
+
+    headerRow.fill = {
+      type: "pattern",
+      pattern: "solid",
+      fgColor: {
+        argb: "1D4ED8",
+      },
+    };
+
+    worksheet.eachRow((row, rowNumber) => {
+      row.eachCell((cell) => {
+        cell.border = {
+          top: {
+            style: "thin",
+          },
+          left: {
+            style: "thin",
+          },
+          bottom: {
+            style: "thin",
+          },
+          right: {
+            style: "thin",
+          },
+        };
+
+        if (rowNumber > 8) {
+          cell.alignment = {
+            vertical: "middle",
+            horizontal: "center",
+          };
+        }
+      });
+    });
+
+    worksheet.views = [
+      {
+        state: "frozen",
+        ySplit: 8,
+      },
+    ];
 
     res.setHeader(
       "Content-Type",
-      "text/csv; charset=utf-8"
+      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
     );
 
     res.setHeader(
       "Content-Disposition",
-      `attachment; filename="bao-cao-tien-do-${range}.csv"`
+      `attachment; filename=bao-cao-tien-do-${range}.xlsx`
     );
 
-    return res.send("\uFEFF" + csv);
+    await workbook.xlsx.write(res);
+
+    res.end();
   } catch (err) {
     console.error(
       "EXPORT PROGRESS ERROR:",

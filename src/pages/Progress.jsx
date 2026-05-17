@@ -30,9 +30,9 @@ const RANGE_OPTIONS = [
 ];
 
 const EXPORT_FILE_NAMES = {
-  week: "bao-cao-tien-do-tuan-nay.csv",
-  month: "bao-cao-tien-do-thang-nay.csv",
-  year: "bao-cao-tien-do-nam-nay.csv",
+  week: "bao-cao-tien-do-tuan-nay.xlsx",
+  month: "bao-cao-tien-do-thang-nay.xlsx",
+  year: "bao-cao-tien-do-nam-nay.xlsx",
 };
 
 export default function Progress() {
