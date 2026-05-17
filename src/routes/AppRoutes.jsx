@@ -10,6 +10,8 @@ import ForgotPassword from "../pages/ForgotPassword";
 import ResetPassword from "../pages/ResetPassword";
 
 const Subjects = lazy(() => import("../pages/Subjects"));
+const SubjectDetail = lazy(() => import("../pages/SubjectDetail"));
+
 const StudyPlans = lazy(() => import("../pages/StudyPlans"));
 const Tasks = lazy(() => import("../pages/Tasks"));
 const Progress = lazy(() => import("../pages/Progress"));
@@ -29,23 +31,48 @@ function FullScreenLoader() {
 
 function PrivateRoute({ children }) {
   const { user } = useAuth();
-  if (!user) return <Navigate to="/login" replace />;
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
   return children;
 }
 
 export default function AppRoutes() {
   const { user, loading } = useAuth();
 
-  if (loading) return <FullScreenLoader />;
+  if (loading) {
+    return <FullScreenLoader />;
+  }
 
   return (
     <BrowserRouter>
       <Suspense fallback={<FullScreenLoader />}>
         <Routes>
-          <Route path="/login" element={user ? <Navigate to="/" replace /> : <Login />} />
-          <Route path="/register" element={user ? <Navigate to="/" replace /> : <Register />} />
-          <Route path="/forgot-password" element={<ForgotPassword />} />
-          <Route path="/reset-password/:token" element={<ResetPassword />} />
+          <Route
+            path="/login"
+            element={
+              user ? <Navigate to="/" replace /> : <Login />
+            }
+          />
+
+          <Route
+            path="/register"
+            element={
+              user ? <Navigate to="/" replace /> : <Register />
+            }
+          />
+
+          <Route
+            path="/forgot-password"
+            element={<ForgotPassword />}
+          />
+
+          <Route
+            path="/reset-password/:token"
+            element={<ResetPassword />}
+          />
 
           <Route
             element={
@@ -55,15 +82,47 @@ export default function AppRoutes() {
             }
           >
             <Route index element={<Home />} />
-            <Route path="subjects" element={<Subjects />} />
-            <Route path="study-plans" element={<StudyPlans />} />
-            <Route path="tasks" element={<Tasks />} />
-            <Route path="progress" element={<Progress />} />
-            <Route path="ai-support" element={<AISupport />} />
-            <Route path="settings" element={<Settings />} />
+
+            <Route
+              path="subjects"
+              element={<Subjects />}
+            />
+
+            <Route
+              path="subjects/:id"
+              element={<SubjectDetail />}
+            />
+
+            <Route
+              path="study-plans"
+              element={<StudyPlans />}
+            />
+
+            <Route
+              path="tasks"
+              element={<Tasks />}
+            />
+
+            <Route
+              path="progress"
+              element={<Progress />}
+            />
+
+            <Route
+              path="ai-support"
+              element={<AISupport />}
+            />
+
+            <Route
+              path="settings"
+              element={<Settings />}
+            />
           </Route>
 
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route
+            path="*"
+            element={<Navigate to="/" replace />}
+          />
         </Routes>
       </Suspense>
     </BrowserRouter>
