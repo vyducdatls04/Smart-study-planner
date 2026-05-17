@@ -25,7 +25,7 @@ export default function AddPlanModal({ onClose, onSuccess }) {
 
     } catch (err) {
       console.error(err);
-      alert("Tạo plan thất bại");
+      alert("Tạo kế hoạch thất bại");
     } finally {
       setLoading(false);
     }
@@ -35,10 +35,10 @@ export default function AddPlanModal({ onClose, onSuccess }) {
     <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
       <div className="bg-white p-6 rounded-xl w-[350px] shadow">
 
-        <h2 className="text-lg font-semibold mb-4">Add Study Plan</h2>
+        <h2 className="text-lg font-semibold mb-4">Thêm kế hoạch học</h2>
 
         <input
-          placeholder="Plan title"
+          placeholder="Tên kế hoạch"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full mb-3 px-3 py-2 border rounded-lg"
@@ -56,7 +56,7 @@ export default function AddPlanModal({ onClose, onSuccess }) {
             onClick={onClose}
             className="px-3 py-1 text-gray-500"
           >
-            Cancel
+            Hủy
           </button>
 
           <button
@@ -64,7 +64,7 @@ export default function AddPlanModal({ onClose, onSuccess }) {
             disabled={loading}
             className="bg-blue-500 text-white px-4 py-1 rounded-lg"
           >
-            {loading ? "Đang tạo..." : "Create"}
+            {loading ? "Đang tạo..." : "Tạo"}
           </button>
         </div>
       </div>

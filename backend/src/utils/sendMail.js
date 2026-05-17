@@ -49,7 +49,7 @@ const createSmtpTransporter = () => {
 
 const sendWithSmtp = async ({ to, subject, html, text }) => {
   if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-    throw new Error("Thiếu EMAIL_USER hoặc EMAIL_PASS trong server env");
+    throw new Error("Thiếu EMAIL_USER hoặc EMAIL_PASS trong môi trường máy chủ");
   }
 
   const transporter = createSmtpTransporter();

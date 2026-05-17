@@ -23,9 +23,9 @@ const SUBJECT_COLORS = [
 ];
 
 const RANGE_OPTIONS = [
-  { key: "week", label: "This Week" },
-  { key: "month", label: "This Month" },
-  { key: "year", label: "This Year" },
+  { key: "week", label: "Tuần này" },
+  { key: "month", label: "Tháng này" },
+  { key: "year", label: "Năm nay" },
 ];
 
 export default function Progress() {
@@ -72,7 +72,7 @@ export default function Progress() {
       window.URL.revokeObjectURL(url);
     } catch (err) {
       console.error(err);
-      alert("Export thất bại");
+      alert("Xuất dữ liệu thất bại");
     } finally {
       setExporting(false);
     }
@@ -91,7 +91,7 @@ export default function Progress() {
 
   const {
     overallProgress = 0,
-    totalStudyTime = "0h 0m",
+    totalStudyTime = "0 giờ 0 phút",
     studyTimeChange = "+0h",
     tasksCompleted = 0,
     tasksTotal = 0,
@@ -111,7 +111,7 @@ export default function Progress() {
     <div className="min-h-screen bg-[#F5F7FB] px-5 py-6 lg:px-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Progress</h1>
+          <h1 className="text-2xl font-semibold text-gray-900">Tiến độ</h1>
           <p className="mt-1 text-sm text-gray-500">
             Theo dõi tiến độ học tập, thời gian học và hiệu suất
           </p>
@@ -163,16 +163,16 @@ export default function Progress() {
             ) : (
               <Download size={16} />
             )}
-            {exporting ? "Exporting..." : "Export"}
+            {exporting ? "Đang xuất..." : "Xuất dữ liệu"}
           </button>
         </div>
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard
-          label="Overall Progress"
+          label="Tiến độ tổng quan"
           value={`${overallProgress}%`}
-          sub="+12% from last month"
+          sub="+12% so với tháng trước"
           subColor="text-emerald-600"
           icon={<TrendingUp size={20} />}
           color="bg-blue-50"
@@ -183,9 +183,9 @@ export default function Progress() {
         />
 
         <StatCard
-          label="Total Study Time"
+          label="Tổng thời gian học"
           value={totalStudyTime}
-          sub={`${studyTimeChange} this week`}
+          sub={`${studyTimeChange} trong tuần này`}
           subColor="text-emerald-600"
           icon={<Clock3 size={20} />}
           color="bg-emerald-50"
@@ -194,9 +194,9 @@ export default function Progress() {
         />
 
         <StatCard
-          label="Tasks Completed"
+          label="Công việc hoàn thành"
           value={`${tasksCompleted} / ${tasksTotal}`}
-          sub={`${taskPercent}% success`}
+          sub={`${taskPercent}% hoàn thành`}
           subColor="text-gray-500"
           icon={<CheckCircle2 size={20} />}
           color="bg-amber-50"
@@ -205,9 +205,9 @@ export default function Progress() {
         />
 
         <StatCard
-          label="Subjects Mastered"
+          label="Môn đã nắm vững"
           value={`${subjectsMastered} / ${subjectsTotal}`}
-          sub={`${Math.max(subjectsTotal - subjectsMastered, 0)} more to go`}
+          sub={`Còn ${Math.max(subjectsTotal - subjectsMastered, 0)} môn`}
           subColor="text-violet-600"
           icon={<Target size={20} />}
           color="bg-violet-50"
@@ -217,7 +217,7 @@ export default function Progress() {
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <SectionCard title="Subject Progress" icon={<BarChart3 size={18} />}>
+        <SectionCard title="Tiến độ theo môn" icon={<BarChart3 size={18} />}>
           {subjects.length === 0 ? (
             <EmptyText text="Chưa có dữ liệu" />
           ) : (
@@ -255,7 +255,7 @@ export default function Progress() {
           )}
         </SectionCard>
 
-        <SectionCard title="Study Hours (Last 7 Days)" icon={<Clock3 size={18} />}>
+        <SectionCard title="Giờ học trong 7 ngày gần nhất" icon={<Clock3 size={18} />}>
           {studyHours.length === 0 ? (
             <EmptyText text="Chưa có dữ liệu" />
           ) : (
@@ -293,7 +293,7 @@ export default function Progress() {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        <SectionCard title="Achievements" icon={<Award size={18} />}>
+        <SectionCard title="Thành tích" icon={<Award size={18} />}>
           {achievements.length === 0 ? (
             <EmptyText text="Chưa có thành tích" />
           ) : (
@@ -322,20 +322,20 @@ export default function Progress() {
           )}
         </SectionCard>
 
-        <SectionCard title="Performance Overview" icon={<TrendingUp size={18} />}>
+        <SectionCard title="Tổng quan hiệu suất" icon={<TrendingUp size={18} />}>
           <div className="space-y-4">
             <PerfRow
-              label="Completed"
+              label="Hoàn thành"
               value={performance.completed}
               color="#1D9E75"
             />
             <PerfRow
-              label="In Progress"
+              label="Đang làm"
               value={performance.inProgress}
               color="#EF9F27"
             />
             <PerfRow
-              label="Pending"
+              label="Chưa làm"
               value={performance.pending}
               color="#E24B4A"
             />
@@ -344,7 +344,7 @@ export default function Progress() {
           <div className="mt-6 flex items-center justify-between border-t border-gray-100 pt-5">
             <div className="flex items-center gap-2 text-gray-400">
               <TrendingUp size={16} />
-              <span className="text-sm">Average Score</span>
+              <span className="text-sm">Điểm trung bình</span>
             </div>
 
             <span className="text-3xl font-semibold text-gray-900">

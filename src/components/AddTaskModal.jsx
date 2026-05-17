@@ -52,11 +52,11 @@ export default function AddTaskModal({ onClose, onSuccess }) {
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
       <div className="bg-white w-[400px] p-6 rounded-2xl shadow-lg">
         <h2 className="text-xl font-semibold mb-4">
-          ➕ Add New Task
+          ➕ Thêm công việc mới
         </h2>
 
         <input
-          placeholder="Task title"
+          placeholder="Tên công việc"
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="w-full mb-3 px-3 py-2 border rounded-xl"
@@ -80,9 +80,9 @@ export default function AddTaskModal({ onClose, onSuccess }) {
           onChange={(e) => setPriority(e.target.value)}
           className="w-full mb-3 px-3 py-2 border rounded-xl"
         >
-          <option value="low">Low</option>
-          <option value="medium">Medium</option>
-          <option value="high">High</option>
+          <option value="low">Thấp</option>
+          <option value="medium">Trung bình</option>
+          <option value="high">Cao</option>
         </select>
 
         <input
@@ -94,11 +94,11 @@ export default function AddTaskModal({ onClose, onSuccess }) {
 
         <div className="flex justify-end gap-2">
           <button onClick={onClose} className="px-4 py-2 bg-gray-200 rounded-xl">
-            Cancel
+            Hủy
           </button>
 
           <button onClick={handleAdd} className="px-4 py-2 bg-blue-500 text-white rounded-xl">
-            Add Task
+            Thêm công việc
           </button>
         </div>
       </div>

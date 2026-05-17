@@ -133,7 +133,7 @@ export default function SubjectDetail() {
           </p>
 
           <p>
-            Deadline gần nhất:{" "}
+            Hạn gần nhất:{" "}
             {nearestDeadline}
           </p>
         </div>
@@ -142,7 +142,7 @@ export default function SubjectDetail() {
       {/* tasks */}
       <div className="rounded-3xl bg-white p-6 shadow">
         <h2 className="mb-5 text-2xl font-bold text-gray-800">
-          Tasks của môn học
+          Công việc của môn học
         </h2>
 
         {tasks.length === 0 ? (
@@ -182,8 +182,8 @@ export default function SubjectDetail() {
                       }`}
                     >
                       {task.completed
-                        ? "Completed"
-                        : "Pending"}
+                        ? "Hoàn thành"
+                        : "Chưa hoàn thành"}
                     </span>
                   </div>
                 </div>

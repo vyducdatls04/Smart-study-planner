@@ -172,15 +172,15 @@ export default function Home() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="mb-2 inline-flex rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-600">
-              Study Overview
+              Tổng quan học tập
             </p>
 
             <h1 className="text-2xl font-semibold text-gray-900">
-              Dashboard
+              Bảng điều khiển
             </h1>
 
             <p className="mt-1 text-sm text-gray-500">
-              Theo dõi task, lịch học và tiến độ trong ngày
+              Theo dõi công việc, lịch học và tiến độ trong ngày
             </p>
           </div>
 
@@ -188,7 +188,7 @@ export default function Home() {
             to="/tasks"
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm font-medium text-gray-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-600"
           >
-            Quản lý tasks
+            Quản lý công việc
             <ArrowRight size={17} />
           </Link>
         </div>
@@ -196,7 +196,7 @@ export default function Home() {
 
       <div className="mb-6 grid grid-cols-2 gap-4 xl:grid-cols-4">
         <StatCard
-          label="Tasks"
+          label="Công việc"
           value={dashboard.totalTasks}
           icon={<ListTodo size={20} />}
           color="bg-blue-50"
@@ -205,7 +205,7 @@ export default function Home() {
         />
 
         <StatCard
-          label="Done"
+          label="Hoàn thành"
           value={dashboard.doneTasks}
           icon={<CheckCircle2 size={20} />}
           color="bg-emerald-50"
@@ -214,7 +214,7 @@ export default function Home() {
         />
 
         <StatCard
-          label="Today"
+          label="Hôm nay"
           value={dashboard.todayTasks}
           icon={<CalendarDays size={20} />}
           color="bg-amber-50"
@@ -223,7 +223,7 @@ export default function Home() {
         />
 
         <StatCard
-          label="Progress"
+          label="Tiến độ"
           value={`${progress}%`}
           progress={progress}
           icon={<TrendingUp size={20} />}
@@ -237,7 +237,7 @@ export default function Home() {
         <div className="space-y-6">
 
           <SectionCard
-            title="Tasks gần đây"
+            title="Công việc gần đây"
             action={
               <Link
                 to="/tasks"
@@ -249,7 +249,7 @@ export default function Home() {
           >
             {!Array.isArray(latestTasks) ||
             latestTasks.length === 0 ? (
-              <EmptyText text="Không có task nào" />
+              <EmptyText text="Không có công việc nào" />
             ) : (
               <div className="divide-y divide-gray-100">
                 {latestTasks.map((task) => {
@@ -309,11 +309,11 @@ export default function Home() {
           </SectionCard>
 
           <SectionCard
-            title={`Tasks ngày ${formatDate(date)}`}
+            title={`Công việc ngày ${formatDate(date)}`}
           >
             {!Array.isArray(selectedTasks) ||
             selectedTasks.length === 0 ? (
-              <EmptyText text="Không có task trong ngày này" />
+              <EmptyText text="Không có công việc trong ngày này" />
             ) : (
               <div className="space-y-2">
                 {selectedTasks.map((task) => (
@@ -346,7 +346,7 @@ export default function Home() {
         </div>
 
         <div className="space-y-6">
-          <SectionCard title="Calendar">
+          <SectionCard title="Lịch">
             <Calendar
               value={date}
               onChange={handleDateChange}
@@ -370,7 +370,7 @@ export default function Home() {
             />
           </SectionCard>
 
-          <SectionCard title="AI Study Plan">
+          <SectionCard title="Kế hoạch học AI">
             <button
               onClick={fetchAI}
               disabled={loadingAI}

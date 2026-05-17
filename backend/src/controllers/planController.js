@@ -1,12 +1,12 @@
 import db from "../config/db.js";
 
-// GET ALL PLANS
+// Lấy toàn bộ kế hoạch
 export const getPlans = async (req, res) => {
   try {
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Chưa đăng nhập" });
     }
 
     const [plans] = await db.query(
@@ -20,18 +20,18 @@ export const getPlans = async (req, res) => {
   }
 };
 
-// CREATE PLAN
+// Tạo kế hoạch
 export const createPlan = async (req, res) => {
   try {
     const { title, due } = req.body;
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Chưa đăng nhập" });
     }
 
     if (!title || !title.trim()) {
-      return res.status(400).json({ message: "Title is required" });
+      return res.status(400).json({ message: "Vui lòng nhập tiêu đề" });
     }
 
     await db.query(
@@ -39,20 +39,20 @@ export const createPlan = async (req, res) => {
       [title.trim(), due || null, userId]
     );
 
-    return res.status(201).json({ message: "Plan created" });
+    return res.status(201).json({ message: "Đã tạo kế hoạch" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
 };
 
-// DELETE PLAN
+// Xóa kế hoạch
 export const deletePlan = async (req, res) => {
   try {
     const { id } = req.params;
     const userId = req.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ message: "Unauthorized" });
+      return res.status(401).json({ message: "Chưa đăng nhập" });
     }
 
     const [result] = await db.query(
@@ -61,10 +61,10 @@ export const deletePlan = async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Plan not found" });
+      return res.status(404).json({ message: "Không tìm thấy kế hoạch" });
     }
 
-    return res.status(200).json({ message: "Plan deleted" });
+    return res.status(200).json({ message: "Đã xóa kế hoạch" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

@@ -2,17 +2,17 @@
 
 const RANGE_CONFIG = {
   week: {
-    label: "This Week",
+    label: "Tuần này",
     intervalSql: "INTERVAL 7 DAY",
     groupFormat: "%a",
   },
   month: {
-    label: "This Month",
+    label: "Tháng này",
     intervalSql: "INTERVAL 30 DAY",
     groupFormat: "%d/%m",
   },
   year: {
-    label: "This Year",
+    label: "Năm nay",
     intervalSql: "INTERVAL 12 MONTH",
     groupFormat: "%b",
   },
@@ -141,8 +141,8 @@ export const getProgress = async (req, res) => {
 
     return res.json({
       overallProgress,
-      totalStudyTime: `${completed} tasks`,
-      studyTimeChange: "+0h",
+      totalStudyTime: `${completed} công việc`,
+      studyTimeChange: "+0 giờ",
       tasksCompleted: completed,
       tasksTotal: total,
       subjectsMastered,
@@ -155,13 +155,13 @@ export const getProgress = async (req, res) => {
       achievements: [
         {
           icon: "✓",
-          label: "Hoan thanh 5 tasks",
+          label: "Hoàn thành 5 công việc",
           done: completed >= 5,
           value: `${completed}/5`,
         },
         {
           icon: "◎",
-          label: "Dat tien do 80%",
+          label: "Đạt tiến độ 80%",
           done: overallProgress >= 80,
           value: `${overallProgress}%`,
         },
@@ -205,14 +205,18 @@ export const exportProgress = async (req, res) => {
     );
 
     const rows = [
-      ["Range", rangeConfig.label],
+      ["Khoảng thời gian", rangeConfig.label],
       [],
-      ["Title", "Deadline", "Priority", "Status"],
+      ["Tiêu đề", "Hạn", "Độ ưu tiên", "Trạng thái"],
       ...tasks.map((task) => [
         task.title,
         task.deadline,
-        task.priority,
-        task.status,
+        task.priority === "high"
+          ? "Cao"
+          : task.priority === "medium"
+            ? "Trung bình"
+            : "Thấp",
+        task.status === "done" ? "Hoàn thành" : "Chưa hoàn thành",
       ]),
     ];
 

@@ -37,7 +37,7 @@ export default function Login() {
       });
 
       if (!res.data?.token || !res.data?.user) {
-        setError("Dữ liệu backend không đúng format");
+        setError("Dữ liệu máy chủ trả về không đúng định dạng");
         return;
       }
 
@@ -54,7 +54,7 @@ export default function Login() {
         err.response?.data?.message ||
         err.response?.data?.error ||
         err.message ||
-        "Lỗi server";
+        "Lỗi máy chủ";
 
       setError(message);
     } finally {

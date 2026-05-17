@@ -42,7 +42,7 @@ export default function StudyPlans() {
       const res = await api.get("/plans");
       setPlans(res.data || []);
     } catch (err) {
-      console.error("Fetch plans error:", err);
+      console.error("Lỗi tải kế hoạch:", err);
     } finally {
       setLoading(false);
     }
@@ -84,7 +84,7 @@ export default function StudyPlans() {
       fetchPlans();
       Swal.fire({ icon: 'success', title: 'Thành công', text: 'Đã thêm kế hoạch!', timer: 1500, showConfirmButton: false });
     } catch (err) {
-      console.error("Create plan error:", err);
+      console.error("Lỗi tạo kế hoạch:", err);
       Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể thêm kế hoạch!' });
     } finally {
       setSaving(false);
@@ -109,7 +109,7 @@ export default function StudyPlans() {
         fetchPlans();
         Swal.fire({ icon: 'success', title: 'Đã xóa!', timer: 1000, showConfirmButton: false });
       } catch (err) {
-        console.error("Delete error:", err);
+      console.error("Lỗi xóa kế hoạch:", err);
         Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Không thể xóa!' });
       }
     }
@@ -120,9 +120,9 @@ export default function StudyPlans() {
       <div className="mb-6 rounded-3xl bg-[#DCEEFF] p-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="mb-2 inline-flex rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-blue-700">Study Schedule</p>
-            <h1 className="text-2xl font-semibold text-gray-900">Study Plans</h1>
-            <p className="mt-1 text-sm text-gray-600">Theo dõi kế hoạch học tập theo timeline</p>
+            <p className="mb-2 inline-flex rounded-full bg-white/70 px-3 py-1 text-xs font-medium text-blue-700">Lịch học</p>
+            <h1 className="text-2xl font-semibold text-gray-900">Kế hoạch học</h1>
+            <p className="mt-1 text-sm text-gray-600">Theo dõi kế hoạch học tập theo dòng thời gian</p>
           </div>
           <button onClick={() => setShowForm((prev) => !prev)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-blue-700">
             {showForm ? <X size={18} /> : <Plus size={18} />}
@@ -162,7 +162,7 @@ export default function StudyPlans() {
         <div className="mb-5 flex items-center gap-2">
           <div className="grid h-9 w-9 place-items-center rounded-xl bg-blue-50 text-blue-600"><CalendarDays size={18} /></div>
           <div>
-            <h2 className="text-sm font-semibold text-gray-800">Timeline kế hoạch</h2>
+            <h2 className="text-sm font-semibold text-gray-800">Dòng thời gian kế hoạch</h2>
             <p className="text-xs text-gray-400">Sắp xếp theo thứ tự thời gian</p>
           </div>
         </div>

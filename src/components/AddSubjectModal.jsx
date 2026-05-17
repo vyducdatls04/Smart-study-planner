@@ -21,22 +21,22 @@ export default function AddSubjectModal({ onClose, onSuccess }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center">
       <div className="bg-white p-6 rounded-2xl w-[350px]">
-        <h2 className="text-lg font-semibold mb-4">Add Subject</h2>
+        <h2 className="text-lg font-semibold mb-4">Thêm môn học</h2>
 
         <input
           value={name}
           onChange={(e) => setName(e.target.value)}
-          placeholder="Subject name"
+          placeholder="Tên môn học"
           className="w-full mb-4 px-3 py-2 border rounded-xl"
         />
 
         <div className="flex justify-end gap-2">
-          <button onClick={onClose}>Cancel</button>
+          <button onClick={onClose}>Hủy</button>
           <button
             onClick={handleAdd}
             className="bg-blue-500 text-white px-4 py-2 rounded-xl"
           >
-            Add
+            Thêm
           </button>
         </div>
       </div>

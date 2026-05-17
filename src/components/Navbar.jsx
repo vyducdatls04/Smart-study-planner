@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Bell, LogOut, Search, Settings, User } from "lucide-react";
 
-export default function Navbar({ userName = "User", onSearch, onLogout }) {
+export default function Navbar({ userName = "Người dùng", onSearch, onLogout }) {
   const [openMenu, setOpenMenu] = useState(false);
   const menuRef = useRef(null);
 
@@ -28,8 +28,8 @@ export default function Navbar({ userName = "User", onSearch, onLogout }) {
 
         <input
           type="search"
-          placeholder="Search..."
-          aria-label="Search"
+          placeholder="Tìm kiếm..."
+          aria-label="Tìm kiếm"
           onChange={(e) => onSearch?.(e.target.value)}
           className="h-10 w-full rounded-full border border-white/70 bg-white pl-11 pr-4 text-sm text-gray-700 shadow-sm outline-none transition placeholder:text-gray-400 focus:border-teal-500 focus:ring-2 focus:ring-teal-100"
         />
@@ -38,7 +38,7 @@ export default function Navbar({ userName = "User", onSearch, onLogout }) {
       <div className="ml-4 flex items-center gap-2 text-gray-700">
         <button
           type="button"
-          aria-label="Notifications"
+          aria-label="Thông báo"
           className="relative grid h-10 w-10 place-items-center rounded-full transition hover:bg-white/45 focus:outline-none focus:ring-2 focus:ring-teal-700"
         >
           <Bell size={18} />
@@ -48,7 +48,7 @@ export default function Navbar({ userName = "User", onSearch, onLogout }) {
         <div ref={menuRef} className="relative">
           <button
             type="button"
-            aria-label="User menu"
+            aria-label="Menu người dùng"
             onClick={() => setOpenMenu((value) => !value)}
             className="flex h-10 items-center gap-2 rounded-full bg-white py-1 pl-1 pr-3 text-sm font-medium text-gray-700 shadow-sm transition hover:bg-teal-50 focus:outline-none focus:ring-2 focus:ring-teal-700"
           >
@@ -68,14 +68,14 @@ export default function Navbar({ userName = "User", onSearch, onLogout }) {
                   {userName}
                 </p>
                 <p className="mt-0.5 text-xs text-gray-400">
-                  Account menu
+                  Menu tài khoản
                 </p>
               </div>
 
               <div className="p-1.5">
-                <MenuItem icon={<User size={16} />} label="Profile" />
+                <MenuItem icon={<User size={16} />} label="Hồ sơ" />
 
-                <MenuItem icon={<Settings size={16} />} label="Settings" />
+                <MenuItem icon={<Settings size={16} />} label="Cài đặt" />
 
                 <button
                   type="button"
@@ -83,7 +83,7 @@ export default function Navbar({ userName = "User", onSearch, onLogout }) {
                   className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-red-600 transition hover:bg-red-50"
                 >
                   <LogOut size={16} />
-                  Logout
+                  Đăng xuất
                 </button>
               </div>
             </div>

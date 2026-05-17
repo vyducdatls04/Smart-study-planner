@@ -148,7 +148,7 @@ export default function AIsupports() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        throw new Error(errorText || "AI request failed");
+        throw new Error(errorText || "Yêu cầu AI thất bại");
       }
 
       const contentType = response.headers.get("content-type") || "";
@@ -160,7 +160,7 @@ export default function AIsupports() {
       }
 
       const reader = response.body?.getReader();
-      if (!reader) throw new Error("Trình duyệt không hỗ trợ stream response");
+      if (!reader) throw new Error("Trình duyệt không hỗ trợ phản hồi dạng stream");
 
       const decoder = new TextDecoder();
       let accumulatedText = "";
@@ -191,8 +191,8 @@ export default function AIsupports() {
 
       updateLastAIMessage(accumulatedText || "AI không phản hồi.", true);
     } catch (err) {
-      console.error("AI request error:", err);
-      updateLastAIMessage("Không thể kết nối với AI. Vui lòng kiểm tra server hoặc API key.", true);
+      console.error("Lỗi yêu cầu AI:", err);
+      updateLastAIMessage("Không thể kết nối với AI. Vui lòng kiểm tra máy chủ hoặc khóa API.", true);
     } finally {
       setIsTyping(false);
     }
@@ -256,7 +256,7 @@ export default function AIsupports() {
                   className="flex items-center gap-1 text-[11px] text-gray-400 transition-colors hover:text-white"
                 >
                   <Copy size={12} />
-                  <span>Copy</span>
+                  <span>Sao chép</span>
                 </button>
               </div>
               <SyntaxHighlighter

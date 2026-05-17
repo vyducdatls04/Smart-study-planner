@@ -18,7 +18,7 @@ export const getTasksByDate = async (req, res) => {
     const { date } = req.query;
 
     if (!date) {
-      return res.status(400).json({ message: "Thiếu date" });
+      return res.status(400).json({ message: "Thiếu ngày" });
     }
 
     const [rows] = await db.query(
@@ -52,7 +52,7 @@ export const createTask = async (req, res) => {
       ]
     );
 
-    return res.json({ message: "Đã tạo task" });
+    return res.json({ message: "Đã tạo công việc" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -80,10 +80,10 @@ export const updateTask = async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Task không tồn tại" });
+      return res.status(404).json({ message: "Công việc không tồn tại" });
     }
 
-    return res.json({ message: "Đã cập nhật task" });
+    return res.json({ message: "Đã cập nhật công việc" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }
@@ -103,7 +103,7 @@ export const updateTaskStatus = async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Task không tồn tại" });
+      return res.status(404).json({ message: "Công việc không tồn tại" });
     }
 
     return res.json({ message: "Đã cập nhật trạng thái" });
@@ -120,10 +120,10 @@ export const deleteTask = async (req, res) => {
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ message: "Task không tồn tại" });
+      return res.status(404).json({ message: "Công việc không tồn tại" });
     }
 
-    return res.json({ message: "Đã xóa task" });
+    return res.json({ message: "Đã xóa công việc" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
   }

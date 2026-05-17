@@ -9,7 +9,7 @@ export const verifyToken = (
     if (!process.env.JWT_SECRET) {
       return res.status(500).json({
         message:
-          "Thiếu JWT_SECRET trong server env",
+          "Thiếu JWT_SECRET trong môi trường máy chủ",
       });
     }
 

@@ -8,8 +8,8 @@ import {
 
 export default function ProgressChart({ completed, total }) {
   const data = [
-    { name: "Done", value: completed },
-    { name: "Pending", value: total - completed },
+    { name: "Hoàn thành", value: completed },
+    { name: "Chưa hoàn thành", value: total - completed },
   ];
 
   const COLORS = ["#22c55e", "#e5e7eb"];
@@ -34,7 +34,7 @@ export default function ProgressChart({ completed, total }) {
 
       <p className="text-center mt-2 text-sm text-gray-500">
         {total === 0
-          ? "No data"
+          ? "Chưa có dữ liệu"
           : `${Math.round((completed / total) * 100)}% hoàn thành`}
       </p>
     </div>

@@ -10,13 +10,13 @@ export default function Sidebar({ onClose }) {
   const { logout } = useAuth();
 
   const menuItems = [
-    { to: "/",            label: "Dashboard",   icon: <LayoutDashboard size={18} /> },
-    { to: "/subjects",    label: "Subjects",    icon: <BookOpen size={18} /> },
-    { to: "/study-plans", label: "Study Plans", icon: <CalendarDays size={18} /> },
-    { to: "/tasks",       label: "Tasks",       icon: <ListTodo size={18} /> },
-    { to: "/progress",    label: "Progress",    icon: <BarChart3 size={18} /> },
-    { to: "/ai-support",  label: "AI Support",  icon: <Bot size={18} /> },
-    { to: "/settings",    label: "Settings",    icon: <Settings size={18} /> },
+    { to: "/",            label: "Tổng quan",   icon: <LayoutDashboard size={18} /> },
+    { to: "/subjects",    label: "Môn học",     icon: <BookOpen size={18} /> },
+    { to: "/study-plans", label: "Kế hoạch học", icon: <CalendarDays size={18} /> },
+    { to: "/tasks",       label: "Công việc",   icon: <ListTodo size={18} /> },
+    { to: "/progress",    label: "Tiến độ",     icon: <BarChart3 size={18} /> },
+    { to: "/ai-support",  label: "Hỗ trợ AI",   icon: <Bot size={18} /> },
+    { to: "/settings",    label: "Cài đặt",     icon: <Settings size={18} /> },
   ];
 
   return (
@@ -58,14 +58,14 @@ export default function Sidebar({ onClose }) {
         </nav>
       </div>
 
-      {/* Logout */}
+      {/* Đăng xuất */}
       <div className="border-t border-white/40 dark:border-[#2e3a4e] pt-5">
         <button
           onClick={logout}
           className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-red-500 dark:text-red-400 transition-all hover:bg-red-100 dark:hover:bg-red-900/20 text-sm"
         >
           <LogOut size={18} />
-          <span>Logout</span>
+          <span>Đăng xuất</span>
         </button>
       </div>
     </div>

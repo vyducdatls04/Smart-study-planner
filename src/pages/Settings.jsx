@@ -15,12 +15,12 @@ import api from "../api/axios";
 import { useAuth } from "../context/useAuth";
 
 const TABS = [
-  { key: "profile", label: "Profile", icon: User },
-  { key: "security", label: "Security", icon: Lock },
-  { key: "preferences", label: "Preferences", icon: Palette },
-  { key: "notifications", label: "Notifications", icon: Bell },
-  { key: "ai", label: "AI Settings", icon: Bot },
-  { key: "danger", label: "Danger Zone", icon: ShieldAlert },
+  { key: "profile", label: "Hồ sơ", icon: User },
+  { key: "security", label: "Bảo mật", icon: Lock },
+  { key: "preferences", label: "Tùy chỉnh", icon: Palette },
+  { key: "notifications", label: "Thông báo", icon: Bell },
+  { key: "ai", label: "Cài đặt AI", icon: Bot },
+  { key: "danger", label: "Khu vực nhạy cảm", icon: ShieldAlert },
 ];
 
 export default function Settings() {
@@ -48,7 +48,7 @@ export default function Settings() {
     <div className="min-h-screen bg-[#F5F7FB] px-5 py-6 transition-colors dark:bg-[#1e2433] lg:px-8">
       <div className="mb-6">
         <h1 className="text-2xl font-semibold text-gray-900 dark:text-white">
-          Settings
+          Cài đặt
         </h1>
 
         <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
@@ -183,7 +183,7 @@ function ProfileTab({ user }) {
     } catch (err) {
       setError(
         err.response?.data?.message ||
-          "Không thể cập nhật profile"
+          "Không thể cập nhật hồ sơ"
       );
     } finally {
       setSaving(false);
@@ -193,14 +193,14 @@ function ProfileTab({ user }) {
   return (
     <div>
       <TabHeader
-        title="Profile"
+        title="Hồ sơ"
         desc="Cập nhật thông tin cá nhân"
       />
 
       <div className="mb-6 flex items-center gap-4 rounded-2xl bg-gray-50 p-4 dark:bg-[#2a3347]">
         <div className="grid h-16 w-16 place-items-center rounded-2xl bg-blue-100 text-2xl font-semibold text-blue-600 dark:bg-blue-900/40 dark:text-blue-300">
           {form.name?.[0]?.toUpperCase() ||
-            "U"}
+            "N"}
         </div>
 
         <div>
@@ -277,7 +277,7 @@ function SecurityTab() {
   return (
     <div>
       <TabHeader
-        title="Security"
+        title="Bảo mật"
         desc="Đổi mật khẩu tài khoản"
       />
 
@@ -299,13 +299,13 @@ function PreferencesTab({
   return (
     <div>
       <TabHeader
-        title="Preferences"
+        title="Tùy chỉnh"
         desc="Tùy chỉnh giao diện"
       />
 
       <SettingRow
         icon={<Moon size={18} />}
-        title="Dark Mode"
+        title="Giao diện tối"
         desc="Chuyển sang giao diện tối"
       >
         <Toggle
@@ -352,7 +352,7 @@ function NotificationsTab() {
           setEnabled(true);
 
           new Notification(
-            "Smart Study Planner",
+            "Trình lập kế hoạch học tập thông minh",
             {
               body: "Thông báo đã được bật 🎉",
             }
@@ -373,13 +373,13 @@ function NotificationsTab() {
   return (
     <div>
       <TabHeader
-        title="Notifications"
+        title="Thông báo"
         desc="Quản lý thông báo"
       />
 
       <SettingRow
         icon={<Bell size={18} />}
-        title="Browser Notifications"
+        title="Thông báo trình duyệt"
         desc="Nhận thông báo học tập trên trình duyệt"
       >
         <button
@@ -407,17 +407,17 @@ function AISettingsTab() {
   return (
     <div>
       <TabHeader
-        title="AI Settings"
+        title="Cài đặt AI"
         desc="Thiết lập AI học tập"
       />
 
       <SettingRow
         icon={<Bot size={18} />}
-        title="Study AI"
+        title="AI học tập"
         desc="Tính năng AI sẽ được nâng cấp trong phiên bản sau"
       >
         <span className="rounded-full bg-blue-50 px-3 py-1 text-xs font-medium text-blue-500 dark:bg-[#2a3347] dark:text-blue-300">
-          Coming soon
+          Sắp ra mắt
         </span>
       </SettingRow>
     </div>
@@ -432,7 +432,7 @@ function DangerTab({ logout }) {
   return (
     <div>
       <TabHeader
-        title="Danger Zone"
+        title="Khu vực nhạy cảm"
         desc="Các hành động nhạy cảm"
         danger
       />
@@ -451,7 +451,7 @@ function DangerTab({ logout }) {
           className="mt-4 inline-flex items-center gap-2 rounded-xl bg-red-500 px-4 py-2 text-sm font-medium text-white transition hover:bg-red-600 active:scale-95"
         >
           <LogOut size={16} />
-          Logout
+          Đăng xuất
         </button>
       </div>
     </div>

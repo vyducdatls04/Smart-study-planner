@@ -58,7 +58,7 @@ export default function ForgotPassword() {
 
         {devLink && (
           <div className="mb-4 rounded-xl border border-amber-100 bg-amber-50 px-4 py-3 text-sm text-amber-700">
-            Dev reset link: <a className="font-medium underline" href={devLink}>{devLink}</a>
+            Liên kết đặt lại mật khẩu khi phát triển: <a className="font-medium underline" href={devLink}>{devLink}</a>
           </div>
         )}
 

@@ -30,7 +30,7 @@ export default function Header({ onMenuClick }) {
             {user?.name?.charAt(0)?.toUpperCase() || "U"}
           </div>
           <span className="text-sm text-gray-600 dark:text-gray-200 hidden sm:block font-medium">
-            {user?.name || "User"}
+            {user?.name || "Người dùng"}
           </span>
         </div>
 
@@ -38,7 +38,7 @@ export default function Header({ onMenuClick }) {
           onClick={logout}
           className="bg-red-500 hover:bg-red-600 text-white px-3 py-1.5 rounded-lg text-sm transition-all active:scale-95"
         >
-          Logout
+          Đăng xuất
         </button>
       </div>
     </div>

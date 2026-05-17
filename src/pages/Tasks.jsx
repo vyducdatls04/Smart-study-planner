@@ -43,7 +43,7 @@ export default function Tasks() {
       const res = await api.get("/tasks");
       setTasks(res.data || []);
     } catch (err) {
-      console.error("Fetch error:", err);
+      console.error("Lỗi tải công việc:", err);
     } finally {
       setLoading(false);
     }
@@ -61,13 +61,13 @@ export default function Tasks() {
       });
       fetchTasks();
     } catch (err) {
-      console.error("Update status error:", err);
+      console.error("Lỗi cập nhật trạng thái:", err);
     }
   }, [fetchTasks]);
 
   const deleteTask = useCallback(async (id) => {
     const result = await Swal.fire({
-      title: 'Xóa Task?',
+      title: 'Xóa công việc?',
       text: "Hành động này không thể hoàn tác!",
       icon: 'warning',
       showCancelButton: true,
@@ -83,7 +83,7 @@ export default function Tasks() {
         fetchTasks();
         Swal.fire({ icon: 'success', title: 'Đã xóa!', timer: 800, showConfirmButton: false });
       } catch (err) {
-        console.error("Delete error:", err); // Đã sử dụng err ở đây để hết lỗi đỏ
+        console.error("Lỗi xóa công việc:", err);
         Swal.fire({ icon: 'error', title: 'Lỗi khi xóa' });
       }
     }
@@ -101,7 +101,7 @@ export default function Tasks() {
       fetchTasks();
       Swal.fire({ icon: 'success', title: 'Thành công', timer: 1000, showConfirmButton: false });
     } catch (err) {
-      console.error("Add task error:", err);
+      console.error("Lỗi thêm công việc:", err);
       Swal.fire({ icon: 'error', title: 'Lỗi khi thêm' });
     }
   };
@@ -121,17 +121,17 @@ export default function Tasks() {
     <div className="min-h-screen bg-[#F5F7FB] px-5 py-6 lg:px-8">
       <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold text-gray-900">Tasks</h1>
-          <p className="mt-1 text-sm text-gray-500">Quản lý công việc và tiến độ</p>
+          <h1 className="text-2xl font-semibold text-gray-900">Công việc</h1>
+          <p className="mt-1 text-sm text-gray-500">Quản lý công việc và tiến độ học tập</p>
         </div>
         <button onClick={() => setShowForm((prev) => !prev)} className="inline-flex items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-blue-700 transition">
           {showForm ? <X size={18} /> : <Plus size={18} />}
-          {showForm ? "Đóng" : "Thêm task"}
+          {showForm ? "Đóng" : "Thêm công việc"}
         </button>
       </div>
 
       <div className="mb-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="Tổng tasks" value={stats.total} icon={<ClipboardList size={20} />} color="bg-blue-50" textColor="text-blue-700" iconBg="bg-blue-100" />
+        <StatCard label="Tổng công việc" value={stats.total} icon={<ClipboardList size={20} />} color="bg-blue-50" textColor="text-blue-700" iconBg="bg-blue-100" />
         <StatCard label="Hoàn thành" value={stats.done} icon={<CheckCircle2 size={20} />} color="bg-emerald-50" textColor="text-emerald-700" iconBg="bg-emerald-100" />
         <StatCard label="Tiến độ" value={`${stats.progress}%`} icon={<Target size={20} />} color="bg-violet-50" textColor="text-violet-700" iconBg="bg-violet-100" progress={stats.progress} />
       </div>
@@ -139,7 +139,7 @@ export default function Tasks() {
       {showForm && (
         <section className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
           <div className="grid gap-3 lg:grid-cols-[1fr_180px_170px_auto]">
-            <input type="text" placeholder="Tên task..." value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onKeyDown={(e) => e.key === "Enter" && addTask()} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-blue-400 transition" />
+            <input type="text" placeholder="Tên công việc..." value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} onKeyDown={(e) => e.key === "Enter" && addTask()} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-blue-400 transition" />
             <input type="date" value={form.deadline} onChange={(e) => setForm({ ...form, deadline: e.target.value })} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none focus:border-blue-400 transition" />
             <select value={form.priority} onChange={(e) => setForm({ ...form, priority: e.target.value })} className="h-11 rounded-xl border border-gray-200 bg-gray-50 px-4 text-sm outline-none">
               <option value="high">Cao</option>
@@ -153,7 +153,7 @@ export default function Tasks() {
 
       <section className="rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
         <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 className="text-sm font-semibold text-gray-800">Danh sách tasks</h2>
+          <h2 className="text-sm font-semibold text-gray-800">Danh sách công việc</h2>
           <div className="flex rounded-xl bg-gray-100 p-1">
             {["all", "pending", "done"].map((k) => (
               <button key={k} onClick={() => setFilter(k)} className={`px-3 py-1.5 text-sm font-medium rounded-lg transition ${filter === k ? "bg-white text-blue-600 shadow-sm" : "text-gray-500"}`}>

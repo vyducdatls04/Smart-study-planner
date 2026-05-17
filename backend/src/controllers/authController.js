@@ -46,7 +46,7 @@ export const register = async (req, res) => {
     return res.status(201).json({ message: "Đăng ký thành công" });
   } catch (err) {
     console.error("REGISTER SERVER ERROR:", err);
-    return res.status(500).json({ message: "Lỗi server" });
+    return res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
 
@@ -59,7 +59,7 @@ export const login = async (req, res) => {
     }
 
     if (!process.env.JWT_SECRET) {
-      return res.status(500).json({ message: "Thiếu JWT_SECRET trong server" });
+      return res.status(500).json({ message: "Thiếu JWT_SECRET trong môi trường máy chủ" });
     }
 
     const [users] = await db.query(
@@ -97,7 +97,7 @@ export const login = async (req, res) => {
     });
   } catch (err) {
     console.error("LOGIN SERVER ERROR:", err);
-    return res.status(500).json({ message: "Lỗi server" });
+    return res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
 
@@ -172,7 +172,7 @@ export const forgotPassword = async (req, res) => {
     return res.json({ message: genericMessage });
   } catch (err) {
     console.error("FORGOT PASSWORD ERROR:", err);
-    return res.status(500).json({ message: "Lỗi server" });
+    return res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
 
@@ -218,6 +218,6 @@ export const resetPassword = async (req, res) => {
     return res.json({ message: "Đặt lại mật khẩu thành công" });
   } catch (err) {
     console.error("RESET PASSWORD ERROR:", err);
-    return res.status(500).json({ message: "Lỗi server" });
+    return res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };

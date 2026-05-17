@@ -13,7 +13,7 @@ export const askGemini = async (prompt) => {
 
     return result.response.text();
   } catch (error) {
-    console.error("Gemini Error:", error);
+    console.error("Lỗi Gemini:", error);
     throw error;
   }
 };
