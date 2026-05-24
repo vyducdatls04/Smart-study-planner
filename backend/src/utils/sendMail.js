@@ -50,7 +50,7 @@ const sendWithResend = async ({ to, subject, html, text }) => {
 
 const createTransportConfigs = () => {
   const emailUser = cleanEnv(process.env.EMAIL_USER);
-  const emailPass = cleanEnv(process.env.EMAIL_PASS);
+  const emailPass = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, "");
   const envHost = cleanEnv(process.env.EMAIL_HOST);
   const envPort = Number(cleanEnv(process.env.EMAIL_PORT));
 
@@ -102,10 +102,10 @@ const createTransportConfigs = () => {
 
 const sendWithSmtp = async ({ to, subject, html, text }) => {
   const emailUser = cleanEnv(process.env.EMAIL_USER);
-  const emailPass = cleanEnv(process.env.EMAIL_PASS);
+  const emailPass = cleanEnv(process.env.EMAIL_PASS).replace(/\s/g, "");
 
   if (!emailUser || !emailPass) {
-    throw new Error("Thiếu EMAIL_USER hoặc EMAIL_PASS trong môi trường máy chủ");
+    throw new Error("Missing EMAIL_USER or EMAIL_PASS on the server");
   }
 
   const errors = [];
@@ -128,7 +128,7 @@ const sendWithSmtp = async ({ to, subject, html, text }) => {
     }
   }
 
-  throw new Error(`Không thể gửi email qua SMTP. ${errors.join(" | ")}`);
+  throw new Error(`Could not send email via SMTP. ${errors.join(" | ")}`);
 };
 
 export const sendMail = async (mailOptions) => {

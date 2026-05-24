@@ -1,4 +1,4 @@
-﻿import crypto from "crypto";
+import crypto from "crypto";
 import db from "../config/db.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -6,6 +6,29 @@ import { sendMail } from "../utils/sendMail.js";
 
 const hashResetToken = (token) => {
   return crypto.createHash("sha256").update(token).digest("hex");
+};
+
+
+const ensureResetPasswordColumns = async () => {
+  const [columns] = await db.query(
+    `
+    SELECT COLUMN_NAME
+    FROM INFORMATION_SCHEMA.COLUMNS
+    WHERE TABLE_SCHEMA = DATABASE()
+      AND TABLE_NAME = 'users'
+      AND COLUMN_NAME IN ('reset_token', 'reset_token_expire')
+    `
+  );
+
+  const existingColumns = new Set(columns.map((column) => column.COLUMN_NAME));
+
+  if (!existingColumns.has("reset_token")) {
+    await db.query("ALTER TABLE users ADD COLUMN reset_token TEXT DEFAULT NULL");
+  }
+
+  if (!existingColumns.has("reset_token_expire")) {
+    await db.query("ALTER TABLE users ADD COLUMN reset_token_expire BIGINT DEFAULT NULL");
+  }
 };
 
 const getFrontendUrl = () => {
@@ -121,7 +144,13 @@ export const forgotPassword = async (req, res) => {
       return res.json({ message: genericMessage });
     }
 
+    await ensureResetPasswordColumns();
+
+
+
     const user = users[0];
+
+
     const rawToken = crypto.randomBytes(32).toString("hex");
     const resetToken = hashResetToken(rawToken);
     const resetTokenExpire = Date.now() + 15 * 60 * 1000;
@@ -188,7 +217,13 @@ export const resetPassword = async (req, res) => {
       return res.status(400).json({ message: "Mật khẩu phải ít nhất 6 ký tự" });
     }
 
+    await ensureResetPasswordColumns();
+
+
+
     const resetToken = hashResetToken(token);
+
+
 
     const [users] = await db.query(
       `
