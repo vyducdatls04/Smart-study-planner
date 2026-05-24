@@ -188,14 +188,11 @@ export const forgotPassword = async (req, res) => {
     } catch (mailErr) {
       console.error("SEND RESET EMAIL ERROR:", mailErr);
 
-      if (process.env.NODE_ENV !== "production") {
-        return res.json({
-          message: "Email chưa được cấu hình. Dùng resetLink dev để test.",
-          resetLink,
-        });
-      }
-
-      return res.status(500).json({ message: "Không thể gửi email reset mật khẩu" });
+      return res.json({
+        message: "Email delivery failed. Use the reset link below.",
+        resetLink,
+        emailSent: false,
+      });
     }
 
     return res.json({ message: genericMessage });
@@ -256,3 +253,4 @@ export const resetPassword = async (req, res) => {
     return res.status(500).json({ message: "Lỗi máy chủ" });
   }
 };
+
