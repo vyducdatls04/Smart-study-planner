@@ -5,6 +5,8 @@ const DAY_MS = 24 * 60 * 60 * 1000;
 const DEFAULT_SETTINGS = {
   enabled: false,
   reminderBefore: "30",
+  emailEnabled: false,
+  emailHour: "7",
 };
 
 function todayKey(date = new Date()) {

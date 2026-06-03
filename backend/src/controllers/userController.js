@@ -1,5 +1,9 @@
 ﻿import db from "../config/db.js";
 import bcrypt from "bcryptjs";
+import {
+  ensureEmailReminderColumns,
+  sendReminderEmailForUser,
+} from "../services/emailReminderService.js";
 
 export const getProfile = async (req, res) => {
   try {
@@ -120,8 +124,18 @@ export const updatePreferences = async (req, res) => {
 
 export const getNotifications = async (req, res) => {
   try {
+    await ensureEmailReminderColumns();
+
     const [rows] = await db.query(
-      "SELECT notif_enabled, notif_before FROM users WHERE id = ?",
+      `
+      SELECT
+        notif_enabled,
+        notif_before,
+        email_notif_enabled,
+        email_notif_hour
+      FROM users
+      WHERE id = ?
+      `,
       [req.user.id]
     );
 
@@ -130,6 +144,8 @@ export const getNotifications = async (req, res) => {
     return res.json({
       enabled: !!settings.notif_enabled,
       reminderBefore: String(settings.notif_before || 30),
+      emailEnabled: !!settings.email_notif_enabled,
+      emailHour: String(settings.email_notif_hour ?? 7),
     });
   } catch (err) {
     return res.status(500).json({ message: err.message });
@@ -138,16 +154,75 @@ export const getNotifications = async (req, res) => {
 
 export const updateNotifications = async (req, res) => {
   try {
-    const { enabled, reminderBefore } = req.body;
+    await ensureEmailReminderColumns();
+
+    const {
+      enabled,
+      reminderBefore,
+      emailEnabled,
+      emailHour,
+    } = req.body;
+
+    const parsedEmailHour = Number.parseInt(emailHour, 10);
+    const safeEmailHour = Number.isNaN(parsedEmailHour)
+      ? 7
+      : Math.min(23, Math.max(0, parsedEmailHour));
 
     await db.query(
-      "UPDATE users SET notif_enabled = ?, notif_before = ? WHERE id = ?",
-      [enabled ? 1 : 0, parseInt(reminderBefore, 10) || 30, req.user.id]
+      `
+      UPDATE users
+      SET
+        notif_enabled = ?,
+        notif_before = ?,
+        email_notif_enabled = ?,
+        email_notif_hour = ?
+      WHERE id = ?
+      `,
+      [
+        enabled ? 1 : 0,
+        parseInt(reminderBefore, 10) || 30,
+        emailEnabled ? 1 : 0,
+        safeEmailHour,
+        req.user.id,
+      ]
     );
 
     return res.json({ message: "Đã lưu" });
   } catch (err) {
     return res.status(500).json({ message: err.message });
+  }
+};
+
+export const sendTestNotificationEmail = async (req, res) => {
+  try {
+    await ensureEmailReminderColumns();
+
+    const [rows] = await db.query(
+      `
+      SELECT id, name, email, notif_before, email_notif_hour
+      FROM users
+      WHERE id = ?
+      `,
+      [req.user.id]
+    );
+
+    if (!rows.length) {
+      return res.status(404).json({ message: "Không tìm thấy user" });
+    }
+
+    const result = await sendReminderEmailForUser(rows[0], {
+      markSent: false,
+    });
+
+    return res.json({
+      message: "Đã gửi email nhắc thử",
+      count: result.count,
+    });
+  } catch (err) {
+    console.error("SEND TEST NOTIFICATION EMAIL ERROR:", err);
+    return res.status(500).json({
+      message: err.message || "Không thể gửi email nhắc thử",
+    });
   }
 };
 

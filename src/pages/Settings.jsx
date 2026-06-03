@@ -333,6 +333,8 @@ function NotificationsTab() {
     summary,
   } = useSmartNotifications(user?.id, { autoFire: false });
   const [saving, setSaving] = useState(false);
+  const [testingEmail, setTestingEmail] = useState(false);
+  const [emailStatus, setEmailStatus] = useState("");
   const [permission, setPermission] = useState(
     typeof window !== "undefined" &&
       "Notification" in window
@@ -353,6 +355,24 @@ function NotificationsTab() {
       alert("Không thể lưu cài đặt thông báo");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const sendTestEmail = async () => {
+    try {
+      setTestingEmail(true);
+      setEmailStatus("");
+      const res = await api.post("/user/notifications/email-test");
+      setEmailStatus(
+        `${res.data.message}. Email gồm ${res.data.count || 0} mục cần nhắc.`
+      );
+    } catch (err) {
+      setEmailStatus(
+        err.response?.data?.message ||
+          "Không thể gửi email thử. Kiểm tra cấu hình Gmail SMTP."
+      );
+    } finally {
+      setTestingEmail(false);
     }
   };
 
@@ -455,6 +475,61 @@ function NotificationsTab() {
             <option value="30">30 ngày</option>
           </select>
         </SettingRow>
+
+        <SettingRow
+          icon={<Bell size={18} />}
+          title="Nhắc qua Gmail"
+          desc="Gửi email tổng hợp công việc và kế hoạch cần chú ý mỗi ngày"
+        >
+          <Toggle
+            checked={!!settings.emailEnabled}
+            onChange={() =>
+              updateSetting({
+                emailEnabled: !settings.emailEnabled,
+              })
+            }
+          />
+        </SettingRow>
+
+        <SettingRow
+          icon={<Clock3 size={18} />}
+          title="Giờ nhận email"
+          desc="Tính theo múi giờ cấu hình của server"
+        >
+          <select
+            value={settings.emailHour || "7"}
+            onChange={(e) =>
+              updateSetting({
+                emailHour: e.target.value,
+              })
+            }
+            disabled={saving}
+            className="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-blue-400 dark:border-[#2e3a4e] dark:bg-[#1e2433] dark:text-white"
+          >
+            {Array.from({ length: 24 }, (_, hour) => (
+              <option key={hour} value={String(hour)}>
+                {String(hour).padStart(2, "0")}:00
+              </option>
+            ))}
+          </select>
+        </SettingRow>
+
+        <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-gray-50 p-4 dark:bg-[#2a3347]">
+          <button
+            type="button"
+            onClick={sendTestEmail}
+            disabled={testingEmail}
+            className="rounded-xl bg-gray-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-white dark:text-gray-900 dark:hover:bg-gray-100"
+          >
+            {testingEmail ? "Đang gửi..." : "Gửi email thử"}
+          </button>
+
+          {emailStatus && (
+            <p className="text-sm text-gray-500 dark:text-gray-300">
+              {emailStatus}
+            </p>
+          )}
+        </div>
 
         <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 dark:border-blue-900/30 dark:bg-blue-950/10">
           <div className="flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-200">

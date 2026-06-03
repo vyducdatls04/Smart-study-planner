@@ -12,6 +12,7 @@ import subjectRoutes from "./src/routes/subjectRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
 import aiRoutes from "./src/routes/aiRoutes.js";
 import planRoutes from "./src/routes/planRoutes.js";
+import { startEmailReminderScheduler } from "./src/services/emailReminderService.js";
 
 const app = express();
 
@@ -105,4 +106,5 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
+  startEmailReminderScheduler();
 });

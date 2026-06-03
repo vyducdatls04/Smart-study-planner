@@ -3,6 +3,7 @@ import {
   getProfile, updateProfile, updatePassword,
   getPreferences, updatePreferences,
   getNotifications, updateNotifications,
+  sendTestNotificationEmail,
   getAISettings, updateAISettings,
   deleteAccount,
 } from "../controllers/userController.js";
@@ -18,6 +19,7 @@ router.get ("/preferences",   getPreferences);
 router.put ("/preferences",   updatePreferences);
 router.get ("/notifications", getNotifications);
 router.put ("/notifications", updateNotifications);
+router.post("/notifications/email-test", sendTestNotificationEmail);
 router.get ("/ai-settings",   getAISettings);
 router.put ("/ai-settings",   updateAISettings);
 router.delete("/account",     deleteAccount);
