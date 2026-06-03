@@ -1,8 +1,11 @@
 import { Menu, Search } from "lucide-react";
 import { useAuth } from "../context/useAuth";
+import NotificationCenter from "./NotificationCenter";
+import { useSmartNotifications } from "../hooks/useSmartNotifications";
 
 export default function Header({ onMenuClick }) {
   const { user, logout } = useAuth();
+  const notifications = useSmartNotifications(user?.id);
 
   return (
     <div className="h-16 bg-white dark:bg-[#252d3d] shadow-sm border-b border-gray-100 dark:border-[#2e3a4e] flex items-center justify-between px-4 lg:px-6 gap-3 flex-shrink-0 transition-colors">
@@ -25,6 +28,16 @@ export default function Header({ onMenuClick }) {
       <div className="flex-1 sm:hidden" />
 
       <div className="flex items-center gap-2 sm:gap-4">
+        <NotificationCenter
+          items={notifications.items}
+          loading={notifications.loading}
+          summary={notifications.summary}
+          onDismiss={notifications.dismissItem}
+          onRefresh={notifications.loadNotifications}
+          onSnooze={notifications.snoozeItem}
+          getItemMessage={notifications.getItemMessage}
+        />
+
         <div className="flex items-center gap-2">
           <div className="w-8 h-8 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-300 font-semibold text-sm">
             {user?.name?.charAt(0)?.toUpperCase() || "U"}

@@ -3,6 +3,7 @@ import {
   Bell,
   Bot,
   CheckCircle2,
+  Clock3,
   Lock,
   LogOut,
   Moon,
@@ -13,6 +14,7 @@ import {
 
 import api from "../api/axios";
 import { useAuth } from "../context/useAuth";
+import { useSmartNotifications } from "../hooks/useSmartNotifications";
 
 const TABS = [
   { key: "profile", label: "Hồ sơ", icon: User },
@@ -324,11 +326,35 @@ function PreferencesTab({
 ====================================================== */
 
 function NotificationsTab() {
-  const [enabled, setEnabled] =
-    useState(
-      Notification.permission ===
-        "granted"
-    );
+  const { user } = useAuth();
+  const {
+    settings,
+    saveSettings,
+    summary,
+  } = useSmartNotifications(user?.id, { autoFire: false });
+  const [saving, setSaving] = useState(false);
+  const [permission, setPermission] = useState(
+    typeof window !== "undefined" &&
+      "Notification" in window
+      ? Notification.permission
+      : "unsupported"
+  );
+
+  const enabled =
+    settings.enabled &&
+    permission === "granted";
+
+  const updateSetting = async (next) => {
+    try {
+      setSaving(true);
+      await saveSettings(next);
+    } catch (err) {
+      console.error("Save notification settings failed:", err);
+      alert("Không thể lưu cài đặt thông báo");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const enableNotifications =
     async () => {
@@ -346,18 +372,21 @@ function NotificationsTab() {
         const permission =
           await Notification.requestPermission();
 
+        setPermission(permission);
+
         if (
           permission === "granted"
         ) {
-          setEnabled(true);
+          await updateSetting({ enabled: true });
 
           new Notification(
             "Trình lập kế hoạch học tập thông minh",
             {
-              body: "Thông báo đã được bật 🎉",
+              body: "Thông báo đã được bật. App sẽ ưu tiên nhắc việc gần hạn.",
             }
           );
         } else {
+          await updateSetting({ enabled: false });
           alert(
             "Bạn đã từ chối thông báo"
           );
@@ -374,27 +403,69 @@ function NotificationsTab() {
     <div>
       <TabHeader
         title="Thông báo"
-        desc="Quản lý thông báo"
+        desc="Quản lý nhắc việc thông minh"
       />
 
-      <SettingRow
-        icon={<Bell size={18} />}
-        title="Thông báo trình duyệt"
-        desc="Nhận thông báo học tập trên trình duyệt"
-      >
-        <button
-          onClick={enableNotifications}
-          className={`rounded-xl px-5 py-2 text-sm font-medium text-white transition ${
-            enabled
-              ? "bg-emerald-500"
-              : "bg-blue-600 hover:bg-blue-700"
-          }`}
+      <div className="max-w-2xl space-y-4">
+        <SettingRow
+          icon={<Bell size={18} />}
+          title="Thông báo trình duyệt"
+          desc="Tự nhắc công việc, kế hoạch gần hạn và quá hạn"
         >
-          {enabled
-            ? "Đã bật"
-            : "Bật thông báo"}
-        </button>
-      </SettingRow>
+          <button
+            onClick={
+              enabled
+                ? () => updateSetting({ enabled: false })
+                : enableNotifications
+            }
+            disabled={saving || permission === "unsupported"}
+            className={`rounded-xl px-5 py-2 text-sm font-medium text-white transition disabled:cursor-not-allowed disabled:opacity-60 ${
+              enabled
+                ? "bg-emerald-500"
+                : "bg-blue-600 hover:bg-blue-700"
+            }`}
+          >
+            {enabled
+              ? "Đã bật"
+              : permission === "unsupported"
+                ? "Không hỗ trợ"
+                : "Bật thông báo"}
+          </button>
+        </SettingRow>
+
+        <SettingRow
+          icon={<Clock3 size={18} />}
+          title="Nhắc trước hạn"
+          desc="Chỉ đưa vào danh sách các mục nằm trong khoảng này"
+        >
+          <select
+            value={settings.reminderBefore}
+            onChange={(e) =>
+              updateSetting({
+                reminderBefore: e.target.value,
+              })
+            }
+            disabled={saving}
+            className="h-10 rounded-xl border border-gray-200 bg-white px-3 text-sm outline-none transition focus:border-blue-400 dark:border-[#2e3a4e] dark:bg-[#1e2433] dark:text-white"
+          >
+            <option value="1">1 ngày</option>
+            <option value="3">3 ngày</option>
+            <option value="7">7 ngày</option>
+            <option value="14">14 ngày</option>
+            <option value="30">30 ngày</option>
+          </select>
+        </SettingRow>
+
+        <div className="rounded-2xl border border-blue-100 bg-blue-50/70 p-4 dark:border-blue-900/30 dark:bg-blue-950/10">
+          <div className="flex items-center gap-2 text-sm font-semibold text-blue-700 dark:text-blue-200">
+            <CheckCircle2 size={17} />
+            Tổng quan thông minh
+          </div>
+          <p className="mt-2 text-sm text-gray-600 dark:text-gray-300">
+            {summary.headline}. Hiện có {summary.total} thông báo đang chờ, trong đó {summary.urgentCount} mục cần ưu tiên.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
