@@ -17,7 +17,13 @@ const getFromAddress = () => {
   const emailFrom = cleanEnv(process.env.EMAIL_FROM);
   if (emailFrom) return emailFrom;
 
+  if (hasValidResendKey()) {
+    return "Smart Study <onboarding@resend.dev>";
+  }
+
   const emailUser = cleanEnv(process.env.EMAIL_USER);
+  if (!emailUser) return "";
+
   return `Smart Study <${emailUser}>`;
 };
 
@@ -44,7 +50,25 @@ const sendWithResend = async ({ to, subject, html, text }) => {
 
   if (!response.ok) {
     const errorText = await response.text();
-    throw new Error(`Resend email error ${response.status}: ${errorText}`);
+    let message = errorText;
+
+    try {
+      const parsed = JSON.parse(errorText);
+      message = parsed.message || parsed.error || errorText;
+    } catch {
+      message = errorText;
+    }
+
+    if (
+      response.status === 403 &&
+      String(message).includes("resend.dev")
+    ) {
+      throw new Error(
+        "Resend đang dùng onboarding@resend.dev nên chỉ gửi được tới email tài khoản Resend của bạn. Để gửi tới email thật của mọi user, hãy verify domain trong Resend và set EMAIL_FROM=Smart Study <noreply@domain-cua-ban.com> trên Render."
+      );
+    }
+
+    throw new Error(`Resend email error ${response.status}: ${message}`);
   }
 };
 
@@ -128,7 +152,9 @@ const sendWithSmtp = async ({ to, subject, html, text }) => {
     }
   }
 
-  throw new Error(`Could not send email via SMTP. ${errors.join(" | ")}`);
+  throw new Error(
+    `Could not send email via SMTP. ${errors.join(" | ")}. Nếu backend chạy trên Render, hãy set RESEND_API_KEY để gửi qua Resend API thay vì Gmail SMTP.`
+  );
 };
 
 export const sendMail = async (mailOptions) => {

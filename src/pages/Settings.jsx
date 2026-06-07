@@ -369,7 +369,7 @@ function NotificationsTab() {
     } catch (err) {
       setEmailStatus(
         err.response?.data?.message ||
-          "Không thể gửi email thử. Kiểm tra cấu hình Gmail SMTP."
+          "Không thể gửi email thử. Kiểm tra RESEND_API_KEY và EMAIL_FROM trên server."
       );
     } finally {
       setTestingEmail(false);
