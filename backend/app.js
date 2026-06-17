@@ -12,6 +12,7 @@ import subjectRoutes from "./src/routes/subjectRoutes.js";
 import dashboardRoutes from "./src/routes/dashboardRoutes.js";
 import aiRoutes from "./src/routes/aiRoutes.js";
 import planRoutes from "./src/routes/planRoutes.js";
+import smartRoutes from "./src/routes/smartRoutes.js";
 import { startEmailReminderScheduler } from "./src/services/emailReminderService.js";
 
 const app = express();
@@ -80,6 +81,7 @@ app.use("/api/subjects", subjectRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/ai", aiRoutes);
 app.use("/api/plans", planRoutes);
+app.use("/api/smart", smartRoutes);
 app.use("/uploads", express.static(path.join(process.cwd(), "uploads")));
 
 app.get("/", (req, res) => {

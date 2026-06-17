@@ -12,6 +12,9 @@ import {
   TrendingUp,
   Sparkles,
   ArrowRight,
+  Brain,
+  AlertTriangle,
+  Target,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
@@ -65,12 +68,14 @@ export default function Home() {
 
   const [ai, setAi] = useState("");
   const [loadingAI, setLoadingAI] = useState(false);
+  const [smart, setSmart] = useState(null);
 
   const fetchAll = useCallback(async () => {
     try {
-      const [tasksRes, dashRes] = await Promise.all([
+      const [tasksRes, dashRes, smartRes] = await Promise.all([
         api.get("/tasks"),
         api.get("/dashboard"),
+        api.get("/smart/recommendations"),
       ]);
 
       const tasksData = Array.isArray(tasksRes.data)
@@ -86,10 +91,13 @@ export default function Home() {
           todayTasks: 0,
         }
       );
+
+      setSmart(smartRes.data || null);
     } catch (err) {
       console.error(err);
 
       setTasks([]);
+      setSmart(null);
     }
   }, []);
 
@@ -232,6 +240,8 @@ export default function Home() {
           iconBg="bg-violet-100"
         />
       </div>
+
+      <SmartRecommendationPanel smart={smart} />
 
       <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
         <div className="space-y-6">
@@ -398,6 +408,165 @@ export default function Home() {
         </div>
       </div>
     </div>
+  );
+}
+
+function SmartRecommendationPanel({ smart }) {
+  const actions = Array.isArray(smart?.actions) ? smart.actions : [];
+  const priorityTasks = Array.isArray(smart?.priorityTasks)
+    ? smart.priorityTasks
+    : [];
+  const weakSubjects = Array.isArray(smart?.weakSubjects)
+    ? smart.weakSubjects
+    : [];
+  const overloadedDays = Array.isArray(smart?.overloadedDays)
+    ? smart.overloadedDays
+    : [];
+
+  const levelClass = {
+    danger: "border-red-100 bg-red-50 text-red-700",
+    warning: "border-amber-100 bg-amber-50 text-amber-700",
+    info: "border-blue-100 bg-blue-50 text-blue-700",
+    success: "border-emerald-100 bg-emerald-50 text-emerald-700",
+  };
+
+  return (
+    <section className="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-3">
+          <div className="grid h-11 w-11 place-items-center rounded-xl bg-indigo-50 text-indigo-600">
+            <Brain size={21} />
+          </div>
+
+          <div>
+            <h2 className="text-sm font-semibold text-gray-900">
+              Gợi ý thông minh hôm nay
+            </h2>
+            <p className="mt-0.5 text-xs text-gray-400">
+              Hệ thống tự phân tích hạn, độ ưu tiên, tiến độ môn học và tải lịch.
+            </p>
+          </div>
+        </div>
+
+        {smart?.summary && (
+          <div className="flex flex-wrap gap-2 text-xs">
+            <span className="rounded-full bg-gray-100 px-3 py-1 font-medium text-gray-600">
+              {smart.summary.pendingTasks || 0} việc chưa xong
+            </span>
+            <span className="rounded-full bg-red-50 px-3 py-1 font-medium text-red-600">
+              {smart.summary.overdueTasks || 0} quá hạn
+            </span>
+            <span className="rounded-full bg-amber-50 px-3 py-1 font-medium text-amber-600">
+              {smart.summary.todayTasks || 0} hôm nay
+            </span>
+          </div>
+        )}
+      </div>
+
+      {!smart ? (
+        <p className="rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-400">
+          Chưa có dữ liệu phân tích thông minh.
+        </p>
+      ) : (
+        <div className="grid gap-4 xl:grid-cols-[1.1fr_1fr]">
+          <div className="space-y-3">
+            {actions.slice(0, 3).map((action, index) => (
+              <div
+                key={`${action.title}-${index}`}
+                className={`rounded-xl border px-4 py-3 ${
+                  levelClass[action.level] || levelClass.info
+                }`}
+              >
+                <div className="flex items-start gap-2">
+                  <AlertTriangle size={16} className="mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-sm font-semibold">{action.title}</p>
+                    <p className="mt-1 text-xs leading-relaxed opacity-85">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+
+            {weakSubjects.length > 0 && (
+              <div className="rounded-xl border border-violet-100 bg-violet-50 px-4 py-3">
+                <p className="mb-2 flex items-center gap-2 text-sm font-semibold text-violet-700">
+                  <Target size={16} />
+                  Môn cần ưu tiên cải thiện
+                </p>
+                <div className="space-y-2">
+                  {weakSubjects.map((subject) => (
+                    <div key={subject.id}>
+                      <div className="mb-1 flex justify-between text-xs text-violet-700">
+                        <span>{subject.name}</span>
+                        <span>{subject.progress}%</span>
+                      </div>
+                      <div className="h-2 overflow-hidden rounded-full bg-white">
+                        <div
+                          className="h-full rounded-full bg-violet-500"
+                          style={{ width: `${subject.progress}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-xl border border-gray-100 bg-gray-50 p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-sm font-semibold text-gray-800">
+                Việc nên làm trước
+              </p>
+              <span className="rounded-full bg-white px-2.5 py-1 text-xs font-medium text-gray-500">
+                Theo điểm ưu tiên
+              </span>
+            </div>
+
+            {priorityTasks.length === 0 ? (
+              <p className="text-sm text-gray-400">
+                Chưa có công việc cần ưu tiên.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {priorityTasks.slice(0, 4).map((task) => (
+                  <div
+                    key={task.id}
+                    className="rounded-xl bg-white px-3 py-2.5 shadow-sm"
+                  >
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-medium text-gray-800">
+                          {task.title}
+                        </p>
+                        <p className="mt-1 text-xs text-gray-400">
+                          {task.deadlineLabel}
+                          {task.subject ? ` · ${task.subject}` : ""}
+                        </p>
+                      </div>
+                      <span className="rounded-full bg-indigo-50 px-2.5 py-1 text-xs font-semibold text-indigo-600">
+                        {task.score}
+                      </span>
+                    </div>
+                    <p className="mt-2 text-xs text-gray-500">
+                      Lý do: {task.reasons?.join(", ")}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {overloadedDays.length > 0 && (
+              <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50 px-3 py-2 text-xs text-amber-700">
+                {overloadedDays[0].message}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+    </section>
   );
 }
 
