@@ -50,11 +50,11 @@ const deadlineScore = (daysLeft) => {
 };
 
 const getDeadlineLabel = (daysLeft) => {
-  if (daysLeft === null) return "Chua co han";
-  if (daysLeft < 0) return `Qua han ${Math.abs(daysLeft)} ngay`;
-  if (daysLeft === 0) return "Den han hom nay";
-  if (daysLeft === 1) return "Den han ngay mai";
-  return `Con ${daysLeft} ngay`;
+  if (daysLeft === null) return "Chưa có hạn";
+  if (daysLeft < 0) return `Quá hạn ${Math.abs(daysLeft)} ngày`;
+  if (daysLeft === 0) return "Đến hạn hôm nay";
+  if (daysLeft === 1) return "Đến hạn ngày mai";
+  return `Còn ${daysLeft} ngày`;
 };
 
 const buildTaskRecommendation = (task) => {
@@ -65,13 +65,13 @@ const buildTaskRecommendation = (task) => {
 
   const reasons = [];
 
-  if (daysLeft !== null && daysLeft < 0) reasons.push("cong viec da qua han");
-  if (daysLeft === 0) reasons.push("den han hom nay");
-  if (daysLeft === 1) reasons.push("den han ngay mai");
-  if (task.priority === "high") reasons.push("muc uu tien cao");
+  if (daysLeft !== null && daysLeft < 0) reasons.push("công việc đã quá hạn");
+  if (daysLeft === 0) reasons.push("đến hạn hôm nay");
+  if (daysLeft === 1) reasons.push("đến hạn ngày mai");
+  if (task.priority === "high") reasons.push("mức ưu tiên cao");
 
   if (!reasons.length) {
-    reasons.push("can duy tri tien do hoc tap");
+    reasons.push("cần duy trì tiến độ học tập");
   }
 
   return {
@@ -205,7 +205,7 @@ export const getSmartRecommendations = async (req, res) => {
         date,
         count,
         limit: MAX_DAILY_TASKS,
-        message: `Ngay ${date} co ${count} cong viec, vuot nguong ${MAX_DAILY_TASKS} cong viec/ngay`,
+        message: `Ngày ${date} có ${count} công việc, vượt ngưỡng ${MAX_DAILY_TASKS} công việc/ngày`,
       }));
 
     const subjectInsights = buildSubjectInsights(subjects);
@@ -216,31 +216,31 @@ export const getSmartRecommendations = async (req, res) => {
     if (overdueTasks.length > 0) {
       actions.push({
         level: "danger",
-        title: "Xu ly cong viec qua han",
-        description: `Ban co ${overdueTasks.length} cong viec qua han. Nen hoan thanh truoc khi them ke hoach moi.`,
+        title: "Xử lý công việc quá hạn",
+        description: `Bạn có ${overdueTasks.length} công việc quá hạn. Nên hoàn thành trước khi thêm kế hoạch mới.`,
       });
     }
 
     if (todayTasks.length > 0) {
       actions.push({
         level: "warning",
-        title: "Tap trung cho hom nay",
-        description: `Hom nay co ${todayTasks.length} cong viec den han. Nen uu tien cac muc diem cao truoc.`,
+        title: "Tập trung cho hôm nay",
+        description: `Hôm nay có ${todayTasks.length} công việc đến hạn. Nên ưu tiên các mục có điểm cao trước.`,
       });
     }
 
     if (weakSubjects.length > 0) {
       actions.push({
         level: "info",
-        title: "Cai thien mon hoc tien do thap",
-        description: `${weakSubjects[0].name} dang co tien do ${weakSubjects[0].progress}%. Nen danh it nhat 30-60 phut de bu lai.`,
+        title: "Cải thiện môn học có tiến độ thấp",
+        description: `${weakSubjects[0].name} đang có tiến độ ${weakSubjects[0].progress}%. Nên dành ít nhất 30-60 phút để bù lại.`,
       });
     }
 
     if (overloadedDays.length > 0) {
       actions.push({
         level: "warning",
-        title: "Lich hoc bi qua tai",
+        title: "Lịch học bị quá tải",
         description: overloadedDays[0].message,
       });
     }
@@ -248,8 +248,8 @@ export const getSmartRecommendations = async (req, res) => {
     if (!actions.length) {
       actions.push({
         level: "success",
-        title: "Lich hoc dang on dinh",
-        description: "Chua phat hien cong viec qua han, qua tai hoac mon hoc tien do thap.",
+        title: "Lịch học đang ổn định",
+        description: "Chưa phát hiện công việc quá hạn, quá tải hoặc môn học có tiến độ thấp.",
       });
     }
 
